@@ -5,7 +5,7 @@ export const CHAIN_CONFIG = {
 	11155111: {
 		// Ethereum Sepolia
 		name: "Ethereum Sepolia",
-		rpcUrl: "https://sepolia.infura.io/v3/YOUR_INFURA_KEY",
+		rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
 		explorerApiUrl: "https://api-sepolia.etherscan.io/api",
 		balanceApiUrl: "https://api.etherscan.io/v2/api",
 		nativeToken: "ETH",
@@ -55,9 +55,10 @@ export async function fetchTransactions(
 	endBlock: number | string = "latest",
 	page = 1,
 	offset = 12,
+	env?: any,
 ): Promise<BlockchainTransaction[]> {
 	const config = CHAIN_CONFIG[chainId];
-	const apiKey = getApiKey(chainId);
+	const apiKey = getApiKey(chainId, env);
 
 	if (!apiKey) {
 		console.warn(`No API key for chain ${chainId}, trying public API`);
@@ -169,14 +170,15 @@ async function fetchTokenTransactions(
 	return data.result;
 }
 
-function getApiKey(chainId: ChainId): string | undefined {
+function getApiKey(chainId: ChainId, env?: any): string | undefined {
+	const etherscanKey = env?.ETHERSCAN_API_KEY;
 	switch (chainId) {
 		case 11155111: // Ethereum Sepolia
-			return process.env.ETHERSCAN_API_KEY;
+			return etherscanKey;
 		case 421614: // Arbitrum Sepolia
-			return process.env.ETHERSCAN_API_KEY;
+			return etherscanKey;
 		case 11155420: // Optimism Sepolia
-			return process.env.ETHERSCAN_API_KEY;
+			return etherscanKey;
 		default:
 			return undefined;
 	}
@@ -191,9 +193,10 @@ interface BalanceResponse {
 export async function fetchBalance(
 	address: string,
 	chainId: ChainId,
+	env?: any,
 ): Promise<{ eth: string; usdc: string }> {
 	const config = CHAIN_CONFIG[chainId];
-	const apiKey = getApiKey(chainId);
+	const apiKey = getApiKey(chainId, env);
 
 	if (!apiKey) {
 		console.warn(`No API key for chain ${chainId}, trying public API`);

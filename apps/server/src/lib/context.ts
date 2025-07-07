@@ -12,6 +12,7 @@ export async function createContext({ context }: CreateContextOptions) {
 	// No auth configured
 	return {
 		session: null,
+		env: context.env,
 	};
 }
 

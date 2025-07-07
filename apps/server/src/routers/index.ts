@@ -28,7 +28,7 @@ export const appRouter: ReturnType<typeof router> = router({
 				chainId: z.number().positive("Chain ID must be positive"),
 			}),
 		)
-		.query(async ({ input }) => {
+		.query(async ({ input, ctx }) => {
 			try {
 				const { address, chainId } = input;
 
@@ -39,7 +39,7 @@ export const appRouter: ReturnType<typeof router> = router({
 					});
 				}
 
-				const balance = await fetchBalance(address, chainId as ChainId);
+				const balance = await fetchBalance(address, chainId as ChainId, ctx.env);
 				const prices = await fetchTokenPrices();
 
 				const ethUsdValue = calculateUsdValue(
@@ -98,7 +98,7 @@ export const appRouter: ReturnType<typeof router> = router({
 				useCursor: z.boolean().optional().default(false),
 			}),
 		)
-		.query(async ({ input }) => {
+		.query(async ({ input, ctx }) => {
 			try {
 				const { address, chainId, limit, offset, cursor, useCursor } = input;
 
@@ -123,6 +123,7 @@ export const appRouter: ReturnType<typeof router> = router({
 									"latest", // endBlock (not used with pagination)
 									1, // page
 									Math.floor(limit / allChainIds.length), // distribute limit across chains
+									ctx.env,
 								);
 
 								const txsToInsert = blockchainTxs.map((tx) => ({
@@ -199,6 +200,7 @@ export const appRouter: ReturnType<typeof router> = router({
 					"latest", // endBlock (not used with pagination)
 					1, // page
 					limit, // offset/limit
+					ctx.env,
 				);
 
 				const txsToInsert = blockchainTransactions.map((tx) => ({
@@ -240,7 +242,7 @@ export const appRouter: ReturnType<typeof router> = router({
 				chainId: z.number().positive("Chain ID must be positive"),
 			}),
 		)
-		.query(async ({ input }) => {
+		.query(async ({ input, ctx }) => {
 			try {
 				const { address, chainId } = input;
 

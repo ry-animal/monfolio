@@ -5,7 +5,7 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"vars": {
 		"NODE_ENV": "production",
-		"CORS_ORIGIN": "https://monad-takehome.ryanlvv.workers.dev"
+		"CORS_ORIGIN": "https://monad-takehome.pages.dev"
 	},
 	// For sensitive data, use:
 	// wrangler secret put SECRET_NAME
