@@ -52,7 +52,7 @@ next-env.d.ts
 
 # Other
 dev-dist
-
+ROADMAP.md
 .wrangler
 .dev.vars*
 

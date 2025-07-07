@@ -1,0 +1,146 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "b793b98d-c7a8-4129-9313-f995ca2ad62f",
+  "prevId": "e395e1d7-ae18-47ab-88aa-0838bf90fc13",
+  "tables": {
+    "transactions": {
+      "name": "transactions",
+      "columns": {
+        "hash": {
+          "name": "hash",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chain_id": {
+          "name": "chain_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "block_number": {
+          "name": "block_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "from": {
+          "name": "from",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "to": {
+          "name": "to",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_address": {
+          "name": "idx_address",
+          "columns": [
+            "address"
+          ],
+          "isUnique": false
+        },
+        "idx_chain_id": {
+          "name": "idx_chain_id",
+          "columns": [
+            "chain_id"
+          ],
+          "isUnique": false
+        },
+        "idx_address_chain": {
+          "name": "idx_address_chain",
+          "columns": [
+            "address",
+            "chain_id"
+          ],
+          "isUnique": false
+        },
+        "idx_timestamp": {
+          "name": "idx_timestamp",
+          "columns": [
+            "timestamp"
+          ],
+          "isUnique": false
+        },
+        "idx_block_number": {
+          "name": "idx_block_number",
+          "columns": [
+            "block_number"
+          ],
+          "isUnique": false
+        },
+        "idx_address_chain_timestamp": {
+          "name": "idx_address_chain_timestamp",
+          "columns": [
+            "address",
+            "chain_id",
+            "timestamp"
+          ],
+          "isUnique": false
+        },
+        "idx_address_chain_block": {
+          "name": "idx_address_chain_block",
+          "columns": [
+            "address",
+            "chain_id",
+            "block_number"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
