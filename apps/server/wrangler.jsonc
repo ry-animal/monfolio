@@ -24,7 +24,7 @@
 			"binding": "DB",
 			"database_name": "monfolio-production-db",
 			"database_id": "07884dec-69ee-47a0-bb7b-6eaca8d5b041",
-			"preview_database_id": "local-test-db",
+			"preview_database_id": "07884dec-69ee-47a0-bb7b-6eaca8d5b041",
 			"migrations_dir": "./src/db/migrations"
 		}
 	]
