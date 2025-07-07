@@ -32,9 +32,8 @@ export function TransactionHistory() {
 	const [useVirtualization, setUseVirtualization] = useState(false);
 
 	// Fetch transactions using individual queries for each network
-	// @ts-ignore - tRPC types issue, but works at runtime
 	const ethQuery = trpc.getTransactions.useQuery(
-		{ address: address || "", chainId: sepolia.id, limit },
+		{ address: address as string, chainId: sepolia.id, limit },
 		{
 			enabled:
 				!!address && (!selectedNetwork || selectedNetwork === sepolia.id),
@@ -43,9 +42,8 @@ export function TransactionHistory() {
 		},
 	);
 
-	// @ts-ignore - tRPC types issue, but works at runtime
 	const arbQuery = trpc.getTransactions.useQuery(
-		{ address: address || "", chainId: arbitrumSepolia.id, limit },
+		{ address: address as string, chainId: arbitrumSepolia.id, limit },
 		{
 			enabled:
 				!!address &&
@@ -55,9 +53,8 @@ export function TransactionHistory() {
 		},
 	);
 
-	// @ts-ignore - tRPC types issue, but works at runtime
 	const opQuery = trpc.getTransactions.useQuery(
-		{ address: address || "", chainId: optimismSepolia.id, limit },
+		{ address: address as string, chainId: optimismSepolia.id, limit },
 		{
 			enabled:
 				!!address &&

@@ -1,7 +1,7 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
 	batchInsertTransactions,
-	getLatestTxBlockNumber,
 	getRecentTransactionsAllChains,
 	getTransactionCount,
 	getTransactionHistory,
@@ -24,186 +24,257 @@ export const appRouter = router({
 	getBalance: publicProcedure
 		.input(
 			z.object({
-				address: z.string(),
-				chainId: z.number(),
+				address: z.string().min(1, "Address is required"),
+				chainId: z.number().positive("Chain ID must be positive"),
 			}),
 		)
 		.query(async ({ input }) => {
-			const { address, chainId } = input;
+			try {
+				const { address, chainId } = input;
 
-			if (!(chainId in CHAIN_CONFIG)) {
-				throw new Error(`Unsupported chain ID: ${chainId}`);
+				if (!(chainId in CHAIN_CONFIG)) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: `Unsupported chain ID: ${chainId}. Supported chains: ${Object.keys(CHAIN_CONFIG).join(", ")}`,
+					});
+				}
+
+				const balance = await fetchBalance(address, chainId as ChainId);
+				const prices = await fetchTokenPrices();
+
+				const ethUsdValue = calculateUsdValue(
+					balance.eth,
+					18,
+					prices.ethereum.usd,
+				);
+				const usdcUsdValue = calculateUsdValue(
+					balance.usdc,
+					6,
+					prices["usd-coin"].usd,
+				);
+
+				return {
+					eth: balance.eth,
+					usdc: balance.usdc,
+					ethUsd: ethUsdValue,
+					usdcUsd: usdcUsdValue,
+					totalUsd: ethUsdValue + usdcUsdValue,
+				};
+			} catch (error) {
+				if (error instanceof TRPCError) {
+					throw error;
+				}
+
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to fetch balance",
+					cause: error,
+				});
 			}
-
-			const balance = await fetchBalance(address, chainId as ChainId);
-			const prices = await fetchTokenPrices();
-
-			const ethUsdValue = calculateUsdValue(
-				balance.eth,
-				18,
-				prices.ethereum.usd,
-			);
-			const usdcUsdValue = calculateUsdValue(
-				balance.usdc,
-				6,
-				prices["usd-coin"].usd,
-			);
-
-			return {
-				eth: balance.eth,
-				usdc: balance.usdc,
-				ethUsd: ethUsdValue,
-				usdcUsd: usdcUsdValue,
-				totalUsd: ethUsdValue + usdcUsdValue,
-			};
 		}),
 
 	getTransactions: publicProcedure
 		.input(
 			z.object({
-				address: z.string(),
-				chainId: z.number().optional(), // Make optional to support all chains
-				limit: z.number().optional().default(12),
-				offset: z.number().optional().default(0),
+				address: z.string().min(1, "Address is required"),
+				chainId: z.number().positive("Chain ID must be positive").optional(),
+				limit: z
+					.number()
+					.min(1, "Limit must be at least 1")
+					.max(500, "Limit cannot exceed 500")
+					.optional()
+					.default(12),
+				offset: z
+					.number()
+					.min(0, "Offset must be non-negative")
+					.optional()
+					.default(0),
 				cursor: z
 					.object({
-						timestamp: z.number(),
-						blockNumber: z.number(),
+						timestamp: z.number().positive("Timestamp must be positive"),
+						blockNumber: z.number().positive("Block number must be positive"),
 					})
 					.optional(),
 				useCursor: z.boolean().optional().default(false),
 			}),
 		)
 		.query(async ({ input }) => {
-			const { address, chainId, limit, offset, cursor, useCursor } = input;
+			try {
+				const { address, chainId, limit, offset, cursor, useCursor } = input;
 
-			// If no chainId specified, get transactions from all chains
-			if (!chainId) {
-				const cachedTransactions = await getRecentTransactionsAllChains(
-					address,
-					limit,
-				);
+				if (!chainId) {
+					try {
+						const cachedTransactions = await getRecentTransactionsAllChains(
+							address,
+							limit,
+						);
 
-				// If we have enough cached transactions, return them
-				if (cachedTransactions.length >= limit) {
-					return cachedTransactions;
+						if (cachedTransactions.length >= limit) {
+							return cachedTransactions;
+						}
+
+						const allChainIds = Object.keys(CHAIN_CONFIG).map(Number);
+						const promises = allChainIds.map(async (cid) => {
+							try {
+								const blockchainTxs = await fetchTransactions(
+									address,
+									cid as ChainId,
+									0, // startBlock (not used with pagination)
+									"latest", // endBlock (not used with pagination)
+									1, // page
+									Math.floor(limit / allChainIds.length), // distribute limit across chains
+								);
+
+								const txsToInsert = blockchainTxs.map((tx) => ({
+									hash: tx.hash,
+									address: address,
+									chainId: cid,
+									blockNumber: Number.parseInt(tx.blockNumber),
+									timestamp: Number.parseInt(tx.timeStamp),
+									from: tx.from,
+									to: tx.to,
+									amount: tx.value,
+									token: tx.tokenSymbol || "ETH",
+								}));
+
+								if (txsToInsert.length > 0) {
+									await batchInsertTransactions(txsToInsert);
+								}
+							} catch (error) {
+								console.error(
+									`Failed to fetch transactions for chain ${cid}:`,
+									error,
+								);
+							}
+						});
+
+						await Promise.allSettled(promises);
+
+						return await getRecentTransactionsAllChains(address, limit);
+					} catch (error) {
+						throw new TRPCError({
+							code: "INTERNAL_SERVER_ERROR",
+							message: "Failed to fetch transactions from all chains",
+							cause: error,
+						});
+					}
 				}
 
-				// Otherwise, fetch from all supported chains
-				const allChainIds = Object.keys(CHAIN_CONFIG).map(Number);
-				const promises = allChainIds.map(async (cid) => {
-					const latestBlock = await getLatestTxBlockNumber(address, cid);
-					const blockchainTxs = await fetchTransactions(
+				if (!(chainId in CHAIN_CONFIG)) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: `Unsupported chain ID: ${chainId}. Supported chains: ${Object.keys(CHAIN_CONFIG).join(", ")}`,
+					});
+				}
+
+				if (useCursor) {
+					const cachedTransactions = await getTransactionHistoryCursor(
 						address,
-						cid as ChainId,
-						latestBlock,
+						chainId,
+						limit,
+						cursor,
 					);
 
-					// Batch insert for better performance
-					const txsToInsert = blockchainTxs.map((tx) => ({
-						hash: tx.hash,
-						address: address,
-						chainId: cid,
-						blockNumber: Number.parseInt(tx.blockNumber),
-						timestamp: Number.parseInt(tx.timeStamp),
-						from: tx.from,
-						to: tx.to,
-						amount: tx.value,
-						token: tx.tokenSymbol || "ETH",
-					}));
-
-					if (txsToInsert.length > 0) {
-						await batchInsertTransactions(txsToInsert);
+					if (cachedTransactions.length > 0) {
+						return cachedTransactions;
 					}
+				} else {
+					const cachedTransactions = await getTransactionHistory(
+						address,
+						chainId,
+						limit,
+						offset,
+					);
+
+					if (cachedTransactions.length > 0) {
+						return cachedTransactions;
+					}
+				}
+
+				// Fetch the most recent transactions using pagination
+				const blockchainTransactions = await fetchTransactions(
+					address,
+					chainId as ChainId,
+					0, // startBlock (not used with pagination)
+					"latest", // endBlock (not used with pagination)
+					1, // page
+					limit, // offset/limit
+				);
+
+				const txsToInsert = blockchainTransactions.map((tx) => ({
+					hash: tx.hash,
+					address: address,
+					chainId: chainId,
+					blockNumber: Number.parseInt(tx.blockNumber),
+					timestamp: Number.parseInt(tx.timeStamp),
+					from: tx.from,
+					to: tx.to,
+					amount: tx.value,
+					token: tx.tokenSymbol || "ETH",
+				}));
+
+				if (txsToInsert.length > 0) {
+					await batchInsertTransactions(txsToInsert);
+				}
+
+				return useCursor
+					? await getTransactionHistoryCursor(address, chainId, limit, cursor)
+					: await getTransactionHistory(address, chainId, limit, offset);
+			} catch (error) {
+				if (error instanceof TRPCError) {
+					throw error;
+				}
+
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to fetch transactions",
+					cause: error,
 				});
-
-				await Promise.allSettled(promises); // Don't fail if one chain fails
-
-				return await getRecentTransactionsAllChains(address, limit);
 			}
-
-			if (!(chainId in CHAIN_CONFIG)) {
-				throw new Error(`Unsupported chain ID: ${chainId}`);
-			}
-
-			// Use cursor-based pagination for better performance with large datasets
-			if (useCursor) {
-				const cachedTransactions = await getTransactionHistoryCursor(
-					address,
-					chainId,
-					limit,
-					cursor,
-				);
-
-				// If we have cached transactions, return them
-				if (cachedTransactions.length > 0) {
-					return cachedTransactions;
-				}
-			} else {
-				// Use offset-based pagination for smaller datasets
-				const cachedTransactions = await getTransactionHistory(
-					address,
-					chainId,
-					limit,
-					offset,
-				);
-
-				// If we have cached transactions, return them
-				if (cachedTransactions.length > 0) {
-					return cachedTransactions;
-				}
-			}
-
-			// Fetch from blockchain and cache
-			const latestBlock = await getLatestTxBlockNumber(address, chainId);
-			const blockchainTransactions = await fetchTransactions(
-				address,
-				chainId as ChainId,
-				latestBlock,
-			);
-
-			// Batch insert for better performance
-			const txsToInsert = blockchainTransactions.map((tx) => ({
-				hash: tx.hash,
-				address: address,
-				chainId: chainId,
-				blockNumber: Number.parseInt(tx.blockNumber),
-				timestamp: Number.parseInt(tx.timeStamp),
-				from: tx.from,
-				to: tx.to,
-				amount: tx.value,
-				token: tx.tokenSymbol || "ETH",
-			}));
-
-			if (txsToInsert.length > 0) {
-				await batchInsertTransactions(txsToInsert);
-			}
-
-			// Return the requested transactions
-			return useCursor
-				? await getTransactionHistoryCursor(address, chainId, limit, cursor)
-				: await getTransactionHistory(address, chainId, limit, offset);
 		}),
 
 	getTransactionCount: publicProcedure
 		.input(
 			z.object({
-				address: z.string(),
-				chainId: z.number(),
+				address: z.string().min(1, "Address is required"),
+				chainId: z.number().positive("Chain ID must be positive"),
 			}),
 		)
 		.query(async ({ input }) => {
-			const { address, chainId } = input;
+			try {
+				const { address, chainId } = input;
 
-			if (!(chainId in CHAIN_CONFIG)) {
-				throw new Error(`Unsupported chain ID: ${chainId}`);
+				if (!(chainId in CHAIN_CONFIG)) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: `Unsupported chain ID: ${chainId}. Supported chains: ${Object.keys(CHAIN_CONFIG).join(", ")}`,
+					});
+				}
+
+				return await getTransactionCount(address, chainId);
+			} catch (error) {
+				if (error instanceof TRPCError) {
+					throw error;
+				}
+
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to get transaction count",
+					cause: error,
+				});
 			}
-
-			return await getTransactionCount(address, chainId);
 		}),
 
 	getTokenPrices: publicProcedure.query(async () => {
-		return await fetchTokenPrices();
+		try {
+			return await fetchTokenPrices();
+		} catch (error) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Failed to fetch token prices",
+				cause: error,
+			});
+		}
 	}),
 });
 

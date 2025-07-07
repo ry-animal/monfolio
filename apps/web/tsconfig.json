@@ -8,16 +8,15 @@
 		"moduleResolution": "Bundler",
 		"verbatimModuleSyntax": true,
 		"skipLibCheck": true,
-		"types": ["vite/client"],
+		"types": [],
 		"rootDirs": ["."],
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+		"typeRoots": ["node_modules/@types"],
+		"noResolve": false
 	},
-	"references": [
-		{
-			"path": "../server"
-		}
-	]
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "../server/src/db/**/*"]
 }

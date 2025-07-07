@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, lt, max, sql } from "drizzle-orm";
+import { and, count, desc, eq, lt, max, sql } from "drizzle-orm";
 import { db } from "./index";
 import { transactions } from "./schema";
 
@@ -34,7 +34,6 @@ export async function getTransactionHistory(
 		.offset(offset);
 }
 
-// Optimized version for large datasets using cursor-based pagination
 export async function getTransactionHistoryCursor(
 	address: string,
 	chainId: number,
@@ -49,7 +48,6 @@ export async function getTransactionHistoryCursor(
 		);
 
 	if (cursor) {
-		// Use cursor-based pagination for better performance
 		return await db
 			.select()
 			.from(transactions)
@@ -57,7 +55,6 @@ export async function getTransactionHistoryCursor(
 				and(
 					eq(transactions.address, address),
 					eq(transactions.chainId, chainId),
-					// Use timestamp and blockNumber for stable ordering
 					and(
 						lt(transactions.timestamp, cursor.timestamp),
 						lt(transactions.blockNumber, cursor.blockNumber),
@@ -73,7 +70,6 @@ export async function getTransactionHistoryCursor(
 		.limit(limit);
 }
 
-// Get transaction count for pagination info
 export async function getTransactionCount(
 	address: string,
 	chainId: number,
@@ -89,7 +85,6 @@ export async function getTransactionCount(
 	return result[0]?.count ?? 0;
 }
 
-// Batch insert with conflict handling for better performance
 export async function batchInsertTransactions(
 	txs: Array<{
 		hash: string;
@@ -105,11 +100,28 @@ export async function batchInsertTransactions(
 ) {
 	if (txs.length === 0) return;
 
-	// Use batch insert with conflict handling
-	return await db.insert(transactions).values(txs).onConflictDoNothing(); // Ignore duplicates
+	// SQLite has batch size limits, so chunk large batches
+	// With 9 fields per transaction, use smaller batch size to stay under 999 parameter limit
+	const BATCH_SIZE = 10;
+	const chunks = [];
+
+	for (let i = 0; i < txs.length; i += BATCH_SIZE) {
+		chunks.push(txs.slice(i, i + BATCH_SIZE));
+	}
+
+	// Process chunks sequentially to avoid overwhelming the database
+	for (const chunk of chunks) {
+		try {
+			await db.insert(transactions).values(chunk).onConflictDoNothing();
+		} catch (error) {
+			console.error(
+				`Error inserting batch of ${chunk.length} transactions:`,
+				error,
+			);
+		}
+	}
 }
 
-// Get transactions for multiple addresses efficiently
 export async function getTransactionHistoryMultiAddress(
 	addresses: string[],
 	chainId: number,
@@ -117,14 +129,12 @@ export async function getTransactionHistoryMultiAddress(
 ) {
 	if (addresses.length === 0) return [];
 
-	// Use IN clause for multiple addresses
 	return await db
 		.select()
 		.from(transactions)
 		.where(
 			and(
 				eq(transactions.chainId, chainId),
-				// Use SQL IN for multiple addresses
 				sql`${transactions.address} IN (${addresses.map((a) => `'${a}'`).join(", ")})`,
 			),
 		)
@@ -132,7 +142,6 @@ export async function getTransactionHistoryMultiAddress(
 		.limit(limit);
 }
 
-// Optimized query for recent transactions across all chains
 export async function getRecentTransactionsAllChains(
 	address: string,
 	limit = 12,
