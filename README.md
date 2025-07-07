@@ -1,22 +1,24 @@
-# monad-takehome
+# Monfolio
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, TRPC, and more.
+A crypto portfolio tracker built with modern web technologies. Track and manage your crypto and NFT portfolio across Ethereum, Arbitrum, and Optimism testnets.
 
 ## Features
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Hono** - Lightweight, performant server framework
-- **tRPC** - End-to-end type-safe APIs
-- **workers** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **SQLite/Turso** - Database engine
-- **Biome** - Linting and formatting
-- **Husky** - Git hooks for code quality
-- **Starlight** - Documentation site with Astro
-- **Turborepo** - Optimized monorepo build system
+- **Multi-Network Support** - Track balances across Ethereum, Arbitrum, and Optimism testnets
+- **Real-time Balance Display** - View your token balances with live pricing data
+- **Transaction History** - Browse and analyze your transaction history
+- **Wallet Integration** - Connect with MetaMask and other Web3 wallets
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
+
+## Tech Stack
+
+- **Frontend**: React + TypeScript with TanStack Router
+- **Styling**: TailwindCSS + shadcn/ui components
+- **Web3**: wagmi + viem for blockchain interactions
+- **Backend**: Hono + tRPC for type-safe APIs
+- **Database**: SQLite with Drizzle ORM
+- **Build**: Turborepo monorepo with Bun package manager
+- **Code Quality**: Biome for linting and formatting
 
 ## Getting Started
 
@@ -28,14 +30,7 @@ bun install
 
 ## Database Setup
 
-This project uses SQLite with Drizzle ORM.
-
-1. Start the local SQLite database:
-   Local development for a Cloudflare D1 database will already be running as part of the `wrangler dev` command.
-
-2. Update your `.env` file in the `apps/server` directory with the appropriate connection details if needed.
-
-3. Apply the schema to your database:
+This project uses SQLite with Drizzle ORM. Apply the schema to your database:
 
 ```bash
 bun db:push
@@ -53,11 +48,12 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 ## Project Structure
 
 ```
-monad-takehome/
+monfolio/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
-│   ├── docs/        # Documentation site (Astro Starlight)
-│   └── server/      # Backend API (Hono, TRPC)
+│   ├── web/         # Frontend application (React + TanStack Router + wagmi)
+│   ├── server/      # Backend API (Hono + tRPC + Drizzle ORM)
+│   └── docs/        # Documentation site (Astro Starlight)
+└── package.json     # Monorepo configuration
 ```
 
 ## Available Scripts
@@ -69,7 +65,6 @@ monad-takehome/
 - `bun check-types`: Check TypeScript types across all apps
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
-- `cd apps/server && bun db:local`: Start the local SQLite database
+- `bun db:generate`: Generate database migrations
+- `bun db:migrate`: Run database migrations
 - `bun check`: Run Biome formatting and linting
-- `cd apps/docs && bun dev`: Start documentation site
-- `cd apps/docs && bun build`: Build documentation site
