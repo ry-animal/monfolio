@@ -8,7 +8,7 @@ export type CreateContextOptions = {
 export async function createContext({ context }: CreateContextOptions) {
 	// Initialize database for this request
 	initDb(context.env);
-	
+
 	// No auth configured
 	return {
 		session: null,

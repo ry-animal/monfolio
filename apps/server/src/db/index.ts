@@ -14,5 +14,5 @@ export const db = new Proxy({} as any, {
 			throw new Error("Database not initialized. Call initDb first.");
 		}
 		return _db[prop];
-	}
+	},
 });

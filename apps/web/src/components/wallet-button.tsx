@@ -22,7 +22,7 @@ const walletOptions: WalletOption[] = [
 ];
 
 export function WalletButton() {
-	const { connectAsync, connectors, isPending, error } = useConnect();
+	const { connectAsync, connectors, isPending } = useConnect();
 	const { isConnected } = useAccount();
 	const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 

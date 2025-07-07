@@ -12,6 +12,7 @@
 		},
 		"outDir": "./dist",
 		"types": ["./worker-configuration", "node"],
+		"lib": ["ESNext"],
 		"composite": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "hono/jsx"
