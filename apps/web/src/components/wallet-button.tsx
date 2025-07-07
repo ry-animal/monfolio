@@ -1,122 +1,154 @@
-import { ConnectKitButton } from "connectkit";
-import { Button } from "./ui/button";
-import { Typography } from "./design-system/typography";
 import { useState } from "react";
+import { useAccount, useConnect } from "wagmi";
+import { Typography } from "./design-system/typography";
 
 interface WalletOption {
-  id: string;
-  name: string;
-  icon: string;
+	id: string;
+	name: string;
+	icon: string;
 }
 
 const walletOptions: WalletOption[] = [
-  {
-    id: "phantom",
-    name: "Phantom",
-    icon: "/LMark.png",
-  },
-  {
-    id: "metamask",
-    name: "MetaMask",
-    icon: "/LMark.png",
-  },
+	{
+		id: "phantom",
+		name: "Phantom",
+		icon: "/Phantom.png",
+	},
+	{
+		id: "metamask",
+		name: "MetaMask",
+		icon: "/MetaMask.png",
+	},
 ];
 
-function WalletSelectionModal({ onClose, onConnect }: { onClose: () => void; onConnect: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
-        <div className="mb-8 text-center">
-          <Typography variant="bodyL" color="secondary" className="mb-6">
-            Track and manage your crypto and NFT portfolio with ease.
-          </Typography>
-
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600">
-              <img src="/LMark.png" alt="Monfolio" className="h-6 w-6" />
-            </div>
-          </div>
-
-          <Typography variant="h6" weight="semiBold" className="mb-6">
-            Connect to Monfolio.
-          </Typography>
-        </div>
-
-        <div className="space-y-3">
-          {walletOptions.map((wallet) => (
-            <button
-              key={wallet.id}
-              onClick={() => {
-                onConnect();
-                onClose();
-              }}
-              className="flex w-full items-center gap-4 rounded-xl bg-gray-50 p-4 transition-colors hover:bg-gray-100"
-            >
-              <img
-                src={wallet.icon}
-                alt={wallet.name}
-                className="h-8 w-8 rounded-lg"
-              />
-              <Typography variant="bodyM" weight="medium">
-                {wallet.name}
-              </Typography>
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 transition-colors hover:text-gray-600"
-        >
-          ✕
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export function WalletButton() {
-  const [showModal, setShowModal] = useState(false);
+	const { connectAsync, connectors, isPending, error } = useConnect();
+	const { isConnected } = useAccount();
+	const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
 
-  return (
-    <>
-      <ConnectKitButton.Custom>
-        {({ isConnected, isConnecting, show, address, ensName, chain }) => {
-          const handleConnect = () => {
-            if (!isConnected) {
-              setShowModal(true);
-            } else {
-              show?.();
-            }
-          };
+	const handleWalletConnect = async (walletId: string) => {
+		setConnectingWallet(walletId);
+		console.log(
+			"Available connectors:",
+			connectors.map((c) => ({ id: c.id, name: c.name, type: c.type })),
+		);
+		console.log("Trying to connect to:", walletId);
 
-          return (
-            <Button
-              onClick={handleConnect}
-              disabled={isConnecting}
-              variant={isConnected ? "outline" : "default"}
-            >
-              {isConnecting
-                ? "Connecting..."
-                : isConnected
-                  ? ensName ?? `${address?.slice(0, 6)}...${address?.slice(-4)}`
-                  : "Connect Wallet"}
-            </Button>
-          );
-        }}
-      </ConnectKitButton.Custom>
+		// Debug available connectors for Phantom
+		if (walletId === "phantom") {
+			console.log(
+				"All injected connectors:",
+				connectors.filter((c) => c.id === "injected"),
+			);
+		}
 
-      {showModal && (
-        <WalletSelectionModal
-          onClose={() => setShowModal(false)}
-          onConnect={() => {
-            const connectButton = document.querySelector('[data-testid="connectkit-connect-button"]') as HTMLButtonElement;
-            if (connectButton) {
-              connectButton.click();
-            }
-          }}
-        />
-      )}
-    </>
-  );
+		// Check if the specific wallet is actually installed
+		if (walletId === "metamask") {
+			console.log(
+				"MetaMask installed?",
+				typeof window !== "undefined" && window.ethereum?.isMetaMask,
+			);
+			if (!window.ethereum?.isMetaMask) {
+				alert(
+					"MetaMask is not installed. Please install MetaMask to continue.",
+				);
+				setConnectingWallet(null);
+				return;
+			}
+		}
+
+		if (walletId === "phantom") {
+			console.log(
+				"Phantom installed?",
+				typeof window !== "undefined" &&
+					(window.ethereum?.isPhantom || window.solana?.isPhantom),
+			);
+			if (!window.ethereum?.isPhantom && !window.solana?.isPhantom) {
+				alert("Phantom is not installed. Please install Phantom to continue.");
+				setConnectingWallet(null);
+				return;
+			}
+		}
+
+		const connector = connectors.find((c) => {
+			if (walletId === "metamask") {
+				return (
+					c.id === "metaMaskSDK" ||
+					c.id === "metaMask" ||
+					(c.id === "injected" && c.name?.toLowerCase().includes("metamask"))
+				);
+			}
+			if (walletId === "phantom") {
+				return (
+					c.id === "app.phantom" ||
+					(c.id === "injected" && c.name?.toLowerCase().includes("phantom"))
+				);
+			}
+			return false;
+		});
+
+		console.log(
+			"Found connector:",
+			connector
+				? { id: connector.id, name: connector.name, type: connector.type }
+				: "none",
+		);
+
+		if (connector) {
+			try {
+				const result = await connectAsync({ connector });
+				console.log("Connection successful:", result);
+			} catch (error) {
+				console.error("Connection failed:", error);
+				if (error instanceof Error && "code" in error && error.code === 4001) {
+					console.log("User rejected the connection");
+				} else {
+					alert(
+						`Failed to connect to ${walletId}: ${error instanceof Error ? error.message : String(error)}`,
+					);
+				}
+			} finally {
+				setConnectingWallet(null);
+			}
+		} else {
+			console.error(`No connector found for wallet: ${walletId}`);
+			setConnectingWallet(null);
+		}
+	};
+
+	if (isConnected) {
+		return null;
+	}
+
+	return (
+		<div className="space-y-3">
+			{walletOptions.map((wallet) => (
+				<button
+					type="button"
+					key={wallet.id}
+					onClick={() => handleWalletConnect(wallet.id)}
+					disabled={isPending}
+					className="ml-6 flex w-[85%] cursor-pointer items-center gap-4 rounded-xl bg-gray-50 px-4 pt-4 pb-2 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+				>
+					<img
+						src={wallet.icon}
+						alt={wallet.name}
+						className="mb-4 size-8 rounded-lg"
+					/>
+					<Typography
+						variant="bodyM"
+						weight="medium"
+						className="flex flex-col items-start"
+					>
+						<div>{wallet.name}</div>
+						<div className="min-h-[16px] text-muted-foreground text-xs">
+							{connectingWallet === wallet.id
+								? `Continue in your ${wallet.name} wallet.`
+								: ""}
+						</div>
+					</Typography>
+				</button>
+			))}
+		</div>
+	);
 }

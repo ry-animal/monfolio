@@ -2,190 +2,209 @@ import { z } from "zod";
 
 // Chain configurations
 export const CHAIN_CONFIG = {
-  11155111: { // Ethereum Sepolia
-    name: "Ethereum Sepolia",
-    rpcUrl: "https://sepolia.infura.io/v3/YOUR_INFURA_KEY",
-    explorerApiUrl: "https://api-sepolia.etherscan.io/api",
-    nativeToken: "ETH",
-    usdcAddress: "0xA0b86a33E6A9b644f3c4c9f6dC80b0d0D1C1Ca01",
-  },
-  421614: { // Arbitrum Sepolia
-    name: "Arbitrum Sepolia",
-    rpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
-    explorerApiUrl: "https://api-sepolia.arbiscan.io/api",
-    nativeToken: "ETH",
-    usdcAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
-  },
-  11155420: { // Optimism Sepolia
-    name: "Optimism Sepolia",
-    rpcUrl: "https://sepolia.optimism.io",
-    explorerApiUrl: "https://api-sepolia-optimistic.etherscan.io/api",
-    nativeToken: "ETH",
-    usdcAddress: "0x5fd84259d66Cd46123540766Be93DFE6D43130D7",
-  },
+	11155111: {
+		// Ethereum Sepolia
+		name: "Ethereum Sepolia",
+		rpcUrl: "https://sepolia.infura.io/v3/YOUR_INFURA_KEY",
+		explorerApiUrl: "https://api-sepolia.etherscan.io/api",
+		nativeToken: "ETH",
+		usdcAddress: "0xA0b86a33E6A9b644f3c4c9f6dC80b0d0D1C1Ca01",
+	},
+	421614: {
+		// Arbitrum Sepolia
+		name: "Arbitrum Sepolia",
+		rpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
+		explorerApiUrl: "https://api-sepolia.arbiscan.io/api",
+		nativeToken: "ETH",
+		usdcAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+	},
+	11155420: {
+		// Optimism Sepolia
+		name: "Optimism Sepolia",
+		rpcUrl: "https://sepolia.optimism.io",
+		explorerApiUrl: "https://api-sepolia-optimistic.etherscan.io/api",
+		nativeToken: "ETH",
+		usdcAddress: "0x5fd84259d66Cd46123540766Be93DFE6D43130D7",
+	},
 } as const;
 
 export type ChainId = keyof typeof CHAIN_CONFIG;
 
 export const TransactionSchema = z.object({
-  hash: z.string(),
-  blockNumber: z.string(),
-  timeStamp: z.string(),
-  from: z.string(),
-  to: z.string(),
-  value: z.string(),
-  contractAddress: z.string().optional(),
-  tokenName: z.string().optional(),
-  tokenSymbol: z.string().optional(),
-  tokenDecimal: z.string().optional(),
+	hash: z.string(),
+	blockNumber: z.string(),
+	timeStamp: z.string(),
+	from: z.string(),
+	to: z.string(),
+	value: z.string(),
+	contractAddress: z.string().optional(),
+	tokenName: z.string().optional(),
+	tokenSymbol: z.string().optional(),
+	tokenDecimal: z.string().optional(),
 });
 
 export type BlockchainTransaction = z.infer<typeof TransactionSchema>;
 
 export async function fetchTransactions(
-  address: string,
-  chainId: ChainId,
-  startBlock: number = 0,
-  endBlock: number | string = "latest"
+	address: string,
+	chainId: ChainId,
+	startBlock = 0,
+	endBlock: number | string = "latest",
 ): Promise<BlockchainTransaction[]> {
-  const config = CHAIN_CONFIG[chainId];
-  const apiKey = getApiKey(chainId);
-  
-  if (!apiKey) {
-    throw new Error(`API key not configured for chain ${chainId}`);
-  }
+	const config = CHAIN_CONFIG[chainId];
+	const apiKey = getApiKey(chainId);
 
-  try {
-    // Fetch native token transactions
-    const ethTransactions = await fetchNativeTransactions(address, config.explorerApiUrl, apiKey, startBlock, endBlock);
-    
-    // Fetch USDC token transactions
-    const usdcTransactions = await fetchTokenTransactions(address, config.usdcAddress, config.explorerApiUrl, apiKey, startBlock, endBlock);
+	if (!apiKey) {
+		throw new Error(`API key not configured for chain ${chainId}`);
+	}
 
-    return [...ethTransactions, ...usdcTransactions];
-  } catch (error) {
-    console.error(`Error fetching transactions for chain ${chainId}:`, error);
-    throw error;
-  }
+	try {
+		// Fetch native token transactions
+		const ethTransactions = await fetchNativeTransactions(
+			address,
+			config.explorerApiUrl,
+			apiKey,
+			startBlock,
+			endBlock,
+		);
+
+		// Fetch USDC token transactions
+		const usdcTransactions = await fetchTokenTransactions(
+			address,
+			config.usdcAddress,
+			config.explorerApiUrl,
+			apiKey,
+			startBlock,
+			endBlock,
+		);
+
+		return [...ethTransactions, ...usdcTransactions];
+	} catch (error) {
+		console.error(`Error fetching transactions for chain ${chainId}:`, error);
+		throw error;
+	}
 }
 
 interface EtherscanResponse {
-  status: string;
-  message: string;
-  result: EtherscanTransaction[];
+	status: string;
+	message: string;
+	result: EtherscanTransaction[];
 }
 
 interface EtherscanTransaction {
-  hash: string;
-  blockNumber: string;
-  timeStamp: string;
-  from: string;
-  to: string;
-  value: string;
-  contractAddress?: string;
-  tokenName?: string;
-  tokenSymbol?: string;
-  tokenDecimal?: string;
+	hash: string;
+	blockNumber: string;
+	timeStamp: string;
+	from: string;
+	to: string;
+	value: string;
+	contractAddress?: string;
+	tokenName?: string;
+	tokenSymbol?: string;
+	tokenDecimal?: string;
 }
 
 async function fetchNativeTransactions(
-  address: string,
-  apiUrl: string,
-  apiKey: string,
-  startBlock: number,
-  endBlock: number | string
+	address: string,
+	apiUrl: string,
+	apiKey: string,
+	startBlock: number,
+	endBlock: number | string,
 ): Promise<BlockchainTransaction[]> {
-  const url = `${apiUrl}?module=account&action=txlist&address=${address}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&apikey=${apiKey}`;
-  
-  const response = await fetch(url);
-  const data = await response.json() as EtherscanResponse;
-  
-  if (data.status !== "1") {
-    throw new Error(`API error: ${data.message}`);
-  }
+	const url = `${apiUrl}?module=account&action=txlist&address=${address}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&apikey=${apiKey}`;
 
-  return data.result.map((tx: EtherscanTransaction) => ({
-    ...tx,
-    tokenSymbol: "ETH",
-    tokenName: "Ethereum",
-    tokenDecimal: "18",
-  }));
+	const response = await fetch(url);
+	const data = (await response.json()) as EtherscanResponse;
+
+	if (data.status !== "1") {
+		throw new Error(`API error: ${data.message}`);
+	}
+
+	return data.result.map((tx: EtherscanTransaction) => ({
+		...tx,
+		tokenSymbol: "ETH",
+		tokenName: "Ethereum",
+		tokenDecimal: "18",
+	}));
 }
 
 async function fetchTokenTransactions(
-  address: string,
-  contractAddress: string,
-  apiUrl: string,
-  apiKey: string,
-  startBlock: number,
-  endBlock: number | string
+	address: string,
+	contractAddress: string,
+	apiUrl: string,
+	apiKey: string,
+	startBlock: number,
+	endBlock: number | string,
 ): Promise<BlockchainTransaction[]> {
-  const url = `${apiUrl}?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&apikey=${apiKey}`;
-  
-  const response = await fetch(url);
-  const data = await response.json() as EtherscanResponse;
-  
-  if (data.status !== "1") {
-    // If no token transactions, return empty array
-    if (data.message === "No transactions found") {
-      return [];
-    }
-    throw new Error(`API error: ${data.message}`);
-  }
+	const url = `${apiUrl}?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&apikey=${apiKey}`;
 
-  return data.result;
+	const response = await fetch(url);
+	const data = (await response.json()) as EtherscanResponse;
+
+	if (data.status !== "1") {
+		// If no token transactions, return empty array
+		if (data.message === "No transactions found") {
+			return [];
+		}
+		throw new Error(`API error: ${data.message}`);
+	}
+
+	return data.result;
 }
 
 function getApiKey(chainId: ChainId): string | undefined {
-  switch (chainId) {
-    case 11155111:
-      return process.env.ETHERSCAN_API_KEY;
-    case 421614:
-      return process.env.ARBISCAN_API_KEY;
-    case 11155420:
-      return process.env.OPTIMISM_ETHERSCAN_API_KEY;
-    default:
-      return undefined;
-  }
+	switch (chainId) {
+		case 11155111:
+			return process.env.ETHERSCAN_API_KEY;
+		case 421614:
+			return process.env.ARBISCAN_API_KEY;
+		case 11155420:
+			return process.env.OPTIMISM_ETHERSCAN_API_KEY;
+		default:
+			return undefined;
+	}
 }
 
 interface BalanceResponse {
-  status: string;
-  message: string;
-  result: string;
+	status: string;
+	message: string;
+	result: string;
 }
 
-export async function fetchBalance(address: string, chainId: ChainId): Promise<{ eth: string; usdc: string }> {
-  const config = CHAIN_CONFIG[chainId];
-  const apiKey = getApiKey(chainId);
-  
-  if (!apiKey) {
-    throw new Error(`API key not configured for chain ${chainId}`);
-  }
+export async function fetchBalance(
+	address: string,
+	chainId: ChainId,
+): Promise<{ eth: string; usdc: string }> {
+	const config = CHAIN_CONFIG[chainId];
+	const apiKey = getApiKey(chainId);
 
-  try {
-    // Fetch ETH balance
-    const ethBalanceUrl = `${config.explorerApiUrl}?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`;
-    const ethResponse = await fetch(ethBalanceUrl);
-    const ethData = await ethResponse.json() as BalanceResponse;
-    
-    if (ethData.status !== "1") {
-      throw new Error(`ETH balance API error: ${ethData.message}`);
-    }
+	if (!apiKey) {
+		throw new Error(`API key not configured for chain ${chainId}`);
+	}
 
-    // Fetch USDC balance
-    const usdcBalanceUrl = `${config.explorerApiUrl}?module=account&action=tokenbalance&contractaddress=${config.usdcAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
-    const usdcResponse = await fetch(usdcBalanceUrl);
-    const usdcData = await usdcResponse.json() as BalanceResponse;
-    
-    const usdcBalance = usdcData.status === "1" ? usdcData.result : "0";
+	try {
+		// Fetch ETH balance
+		const ethBalanceUrl = `${config.explorerApiUrl}?module=account&action=balance&address=${address}&tag=latest&apikey=${apiKey}`;
+		const ethResponse = await fetch(ethBalanceUrl);
+		const ethData = (await ethResponse.json()) as BalanceResponse;
 
-    return {
-      eth: ethData.result,
-      usdc: usdcBalance,
-    };
-  } catch (error) {
-    console.error(`Error fetching balance for chain ${chainId}:`, error);
-    throw error;
-  }
+		if (ethData.status !== "1") {
+			throw new Error(`ETH balance API error: ${ethData.message}`);
+		}
+
+		// Fetch USDC balance
+		const usdcBalanceUrl = `${config.explorerApiUrl}?module=account&action=tokenbalance&contractaddress=${config.usdcAddress}&address=${address}&tag=latest&apikey=${apiKey}`;
+		const usdcResponse = await fetch(usdcBalanceUrl);
+		const usdcData = (await usdcResponse.json()) as BalanceResponse;
+
+		const usdcBalance = usdcData.status === "1" ? usdcData.result : "0";
+
+		return {
+			eth: ethData.result,
+			usdc: usdcBalance,
+		};
+	} catch (error) {
+		console.error(`Error fetching balance for chain ${chainId}:`, error);
+		throw error;
+	}
 }

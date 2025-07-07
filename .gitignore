@@ -5,6 +5,8 @@ node_modules
 .cursor/
 .claude/
 .vscode/
+tasks/
+CLAUDE.md
 .idea/
 *.swp
 *.swo
