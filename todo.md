@@ -68,7 +68,6 @@
 ## 🐛 Known Issues
 
 ### Linting Warnings (Non-blocking)
-- Auto-generated files in `apps/docs/.astro/` contain linting warnings
 - Wrangler generated files have unused import warnings
 - These don't affect functionality but should be addressed for clean builds
 

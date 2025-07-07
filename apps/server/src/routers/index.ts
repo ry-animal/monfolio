@@ -16,7 +16,7 @@ import {
 } from "../services/blockchain";
 import { calculateUsdValue, fetchTokenPrices } from "../services/coingecko";
 
-export const appRouter = router({
+export const appRouter: ReturnType<typeof router> = router({
 	healthCheck: publicProcedure.query(() => {
 		return "OK";
 	}),

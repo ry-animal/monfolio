@@ -51,8 +51,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 monfolio/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Router + wagmi)
-│   ├── server/      # Backend API (Hono + tRPC + Drizzle ORM)
-│   └── docs/        # Documentation site (Astro Starlight)
+│   └── server/      # Backend API (Hono + tRPC + Drizzle ORM)
 └── package.json     # Monorepo configuration
 ```
 
