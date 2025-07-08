@@ -29,7 +29,6 @@ export function Typography({
 	const fontConfig = typographyTokens.fontSizes[variant];
 	const fontWeight = typographyTokens.fontWeights[weight];
 
-	// Support both color tokens and palette colors
 	const textColor =
 		color in colorTokens
 			? colorTokens[color as ColorToken]

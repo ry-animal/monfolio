@@ -1,14 +1,16 @@
 import { createPublicClient, http } from "viem";
 import { createConfig } from "wagmi";
-import { arbitrumSepolia, baseSepolia, optimismSepolia, sepolia } from "wagmi/chains";
+import {
+	arbitrumSepolia,
+	baseSepolia,
+	optimismSepolia,
+	sepolia,
+} from "wagmi/chains";
 import { injected, metaMask } from "wagmi/connectors";
 
 export const config = createConfig({
 	chains: [sepolia, arbitrumSepolia, optimismSepolia, baseSepolia],
-	connectors: [
-		metaMask(),
-		injected(),
-	],
+	connectors: [metaMask(), injected()],
 	transports: {
 		[sepolia.id]: http(),
 		[arbitrumSepolia.id]: http(),
@@ -22,7 +24,12 @@ export const publicClient = createPublicClient({
 	transport: http(),
 });
 
-export const SUPPORTED_CHAINS = [sepolia, arbitrumSepolia, optimismSepolia, baseSepolia];
+export const SUPPORTED_CHAINS = [
+	sepolia,
+	arbitrumSepolia,
+	optimismSepolia,
+	baseSepolia,
+];
 
 export const CHAIN_EXPLORERS = {
 	[sepolia.id]: "https://sepolia.etherscan.io",

@@ -1,7 +1,11 @@
-import { Copy, LogOut } from "lucide-react";
+import { Copy, ExternalLink, LogOut } from "lucide-react";
+import { useState } from "react";
 import { useAccount, useDisconnect } from "wagmi";
+import { arbitrumSepolia, optimismSepolia, sepolia } from "wagmi/chains";
+import { CHAIN_EXPLORERS } from "../lib/web3";
+import { trpc } from "../utils/trpc";
 import { BalanceDisplay } from "./balance-display";
-import { BodyL, H1 } from "./design-system";
+import { BodyL, H1, H5 } from "./design-system";
 import { NetworkSelector } from "./network-selector";
 import { TransactionHistory } from "./transaction-history";
 import { WalletButton } from "./wallet-button";
@@ -9,6 +13,42 @@ import { WalletButton } from "./wallet-button";
 export function Dashboard() {
 	const { isConnected, address } = useAccount();
 	const { disconnect } = useDisconnect();
+	const [activeTab, setActiveTab] = useState<"balances" | "transactions">(
+		"balances",
+	);
+	const [selectedNetworks, setSelectedNetworks] = useState<number[]>([
+		sepolia.id,
+	]);
+	const [transactionNetworks, setTransactionNetworks] = useState<number[]>([
+		sepolia.id,
+	]);
+
+	// Get total balance across all networks
+	const sepoliaBalance = trpc.getBalance.useQuery(
+		{ address: address as string, chainId: sepolia.id },
+		{ enabled: !!address },
+	);
+	const arbitrumBalance = trpc.getBalance.useQuery(
+		{ address: address as string, chainId: arbitrumSepolia.id },
+		{ enabled: !!address },
+	);
+	const optimismBalance = trpc.getBalance.useQuery(
+		{ address: address as string, chainId: optimismSepolia.id },
+		{ enabled: !!address },
+	);
+
+	const totalBalance = [
+		sepoliaBalance,
+		arbitrumBalance,
+		optimismBalance,
+	].reduce((sum, balance) => {
+		return sum + (balance.data?.totalUsd || 0);
+	}, 0);
+
+	const getExplorerLink = (address: string, chainId: number = sepolia.id) => {
+		const baseUrl = CHAIN_EXPLORERS[chainId as keyof typeof CHAIN_EXPLORERS];
+		return baseUrl ? `${baseUrl}/address/${address}` : "#";
+	};
 
 	if (!isConnected) {
 		return (
@@ -49,29 +89,13 @@ export function Dashboard() {
 					<H1 color="monad-purple" weight="bold">
 						Monfolio
 					</H1>
-					<BodyL className="text-muted-foreground">
-						Your portfolio across Ethereum, Arbitrum, and Optimism testnets
-					</BodyL>
 				</div>
 
 				<div className="flex items-center gap-2">
-					<BodyL weight="medium" className="text-gray-700">
-						{address
-							? `${address.slice(0, 6)}...${address.slice(-4)}`
-							: "Connected"}
-					</BodyL>
-					<button
-						type="button"
-						onClick={() => navigator.clipboard.writeText(address || "")}
-						className="rounded p-1 hover:bg-gray-100"
-						title="Copy address"
-					>
-						<Copy className="size-4" aria-label="Copy address" />
-					</button>
 					<button
 						type="button"
 						onClick={() => disconnect()}
-						className="ml-2 rounded p-1 hover:bg-gray-100"
+						className="rounded p-1 hover:bg-gray-100"
 						title="Disconnect wallet"
 					>
 						<LogOut className="size-4" aria-label="Disconnect wallet" />
@@ -79,18 +103,84 @@ export function Dashboard() {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-				<div className="lg:col-span-1">
-					<NetworkSelector />
+			<div className="flex flex-col gap-4 md:flex-row md:gap-12">
+				<div>
+					<p className="mb-1 text-muted-foreground text-sm">Address</p>
+					<div className="flex items-center gap-2">
+						<span className="font-mono text-sm">
+							{address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ""}
+						</span>
+						<button
+							type="button"
+							onClick={() => navigator.clipboard.writeText(address || "")}
+							className="rounded p-1 hover:bg-gray-100"
+							title="Copy address"
+						>
+							<Copy className="size-3" />
+						</button>
+						<a
+							href={getExplorerLink(address || "")}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="rounded p-1 hover:bg-gray-100"
+							title="View on Etherscan"
+						>
+							<ExternalLink className="size-3" />
+						</a>
+					</div>
 				</div>
-				<div className="lg:col-span-2">
-					<BalanceDisplay />
+				<div>
+					<p className="mb-1 text-muted-foreground text-sm">Total Balance</p>
+					<p className="font-bold text-lg">${totalBalance.toFixed(2)}</p>
 				</div>
 			</div>
 
-			<div className="w-full">
-				<TransactionHistory />
+			<div className="flex gap-8 border-b">
+				<button
+					type="button"
+					onClick={() => setActiveTab("balances")}
+					className={`pb-2 ${activeTab === "balances"
+						? "border-monad-purple border-b-2 font-medium"
+						: "text-muted-foreground"
+						}`}
+				>
+					Balances
+				</button>
+				<button
+					type="button"
+					onClick={() => setActiveTab("transactions")}
+					className={`pb-2 ${activeTab === "transactions"
+						? "border-monad-purple border-b-2 font-medium"
+						: "text-muted-foreground"
+						}`}
+				>
+					Past Transactions
+				</button>
 			</div>
+
+			{activeTab === "balances" ? (
+				<div className="space-y-4">
+					<H5>Balances</H5>
+					<div className="w-64">
+						<NetworkSelector
+							selectedNetworks={selectedNetworks}
+							onNetworkChange={setSelectedNetworks}
+						/>
+					</div>
+					<BalanceDisplay selectedNetworks={selectedNetworks} />
+				</div>
+			) : (
+				<div className="space-y-4">
+					<H5>Past Transactions</H5>
+					<div className="w-64">
+						<NetworkSelector
+							selectedNetworks={transactionNetworks}
+							onNetworkChange={setTransactionNetworks}
+						/>
+					</div>
+					<TransactionHistory selectedNetworks={transactionNetworks} />
+				</div>
+			)}
 		</div>
 	);
 }
