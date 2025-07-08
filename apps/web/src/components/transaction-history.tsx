@@ -173,7 +173,10 @@ export function TransactionHistory({
 			{isLoading ? (
 				<div className="space-y-3">
 					{Array.from({ length: 3 }, (_, i) => (
-						<div key={`skeleton-${i + 1}`} className="overflow-hidden rounded-lg">
+						<div
+							key={`skeleton-${i + 1}`}
+							className="overflow-hidden rounded-lg"
+						>
 							<div className="px-4 py-3">
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
@@ -252,7 +255,6 @@ export function TransactionHistory({
 						</thead>
 						<tbody>
 							{allTransactions.map((tx) => {
-								const networkInfo = getNetworkInfo(tx.chainId);
 								return (
 									<tr
 										key={`${tx.hash}-${tx.chainId}`}

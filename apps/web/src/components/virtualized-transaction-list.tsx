@@ -51,10 +51,7 @@ export function VirtualizedTransactionList({
 	}
 
 	return (
-		<div
-			ref={parentRef}
-			className="h-[600px] overflow-auto"
-		>
+		<div ref={parentRef} className="h-[600px] overflow-auto">
 			<div
 				style={{
 					height: `${virtualizer.getTotalSize()}px`,

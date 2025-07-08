@@ -7,7 +7,7 @@ declare global {
 		 */
 		solana?: {
 			isPhantom?: boolean;
-			[key: string]: any;
+			[key: string]: unknown;
 		};
 	}
 }

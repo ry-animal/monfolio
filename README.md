@@ -4,7 +4,7 @@
 
 A crypto portfolio tracker built with modern web technologies. Track and manage your crypto and NFT portfolio across Ethereum, Arbitrum, and Optimism testnets.
 
-*Built as a takehome project for Monad Labs*
+_Built as a takehome project for Monad Labs_
 
 ## Features
 
@@ -17,7 +17,7 @@ A crypto portfolio tracker built with modern web technologies. Track and manage 
 ## Tech Stack
 
 - **Frontend**: React + TypeScript with TanStack Router
-- **Styling**: TailwindCSS + shadcn/ui components  
+- **Styling**: TailwindCSS + shadcn/ui components
 - **Web3**: wagmi + viem for blockchain interactions
 - **Wallet**: ConnectKit for wallet connections
 - **Backend**: Hono + tRPC for type-safe APIs
@@ -64,33 +64,39 @@ monfolio/
 ## Available Scripts
 
 ### Development
+
 - `bun dev`: Start all applications in development mode
 - `bun dev:web`: Start only the web application
 - `bun dev:server`: Start only the server
 
 ### Build & Quality
+
 - `bun build`: Build all applications
 - `bun check`: Run Biome formatting and linting
 - `bun check-types`: Check TypeScript types across all apps
 
 ### Database
+
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
 - `bun db:generate`: Generate database migrations
 - `bun db:migrate`: Run database migrations
 
 ### Deployment
+
 - `bun run deploy`: Deploy web app to Cloudflare Pages
 - `bun kill`: Kill development servers running on ports 3000, 3001, 8787
 
 ## Deployment
 
 The application is deployed to Cloudflare:
+
 - **Frontend**: Cloudflare Pages
 - **Backend**: Cloudflare Workers
 - **Database**: Cloudflare D1
 
 ### Production Environment
+
 - **Web App**: [https://monad-takehome.ry-animal.workers.dev](https://monad-takehome.ry-animal.workers.dev)
 - **API**: Deployed via Cloudflare Workers
 - **Database**: Cloudflare D1 with production database binding
