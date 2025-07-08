@@ -126,7 +126,7 @@ export const appRouter: ReturnType<typeof router> = router({
 									0, // startBlock (not used with pagination)
 									"latest", // endBlock (not used with pagination)
 									1, // page
-									Math.floor(limit / allChainIds.length), // distribute limit across chains
+									Math.max(1, Math.floor(limit / allChainIds.length)), // distribute limit across chains, minimum 1
 									ctx.env,
 								);
 

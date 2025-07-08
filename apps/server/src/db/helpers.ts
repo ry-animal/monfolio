@@ -101,7 +101,8 @@ export async function batchInsertTransactions(
 	if (txs.length === 0) return;
 
 	// SQLite has batch size limits, so chunk large batches
-	// With 9 fields per transaction, use smaller batch size to stay under 999 parameter limit
+	// With 9 fields per transaction, use smaller batch size to stay under D1's parameter limit (999)
+	// 999 ÷ 9 fields = 111 max transactions per batch, using 10 for safety margin
 	const BATCH_SIZE = 10;
 	const chunks = [];
 
@@ -112,12 +113,16 @@ export async function batchInsertTransactions(
 	// Process chunks sequentially to avoid overwhelming the database
 	for (const chunk of chunks) {
 		try {
+			console.log(
+				`Inserting batch of ${chunk.length} transactions (${chunk.length * 9} parameters)`,
+			);
 			await db.insert(transactions).values(chunk).onConflictDoNothing();
 		} catch (error) {
 			console.error(
-				`Error inserting batch of ${chunk.length} transactions:`,
+				`Error inserting batch of ${chunk.length} transactions (${chunk.length * 9} parameters):`,
 				error,
 			);
+			// Continue processing other chunks instead of failing completely
 		}
 	}
 }

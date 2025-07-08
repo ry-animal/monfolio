@@ -139,6 +139,7 @@ export function WalletButton() {
 						variant="bodyM"
 						weight="medium"
 						className="flex flex-col items-start"
+						as="div"
 					>
 						<div>{wallet.name}</div>
 						<div className="min-h-[16px] text-muted-foreground text-xs">

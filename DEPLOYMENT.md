@@ -22,6 +22,7 @@ The production deployment uses these environment variables from `wrangler.toml`:
 ### Database Configuration
 
 Production uses Cloudflare D1 database:
+
 - Database name: `monfolio-production-db`
 - Database ID: `07884dec-69ee-47a0-bb7b-6eaca8d5b041`
 
