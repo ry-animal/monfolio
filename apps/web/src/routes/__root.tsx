@@ -25,33 +25,25 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
 		meta: [
 			{
-				title: "Monfolio - Legitimate Web3 Portfolio Tracker | Blockchain Analytics",
+				title: "Monfolio - Web3 Portfolio Tracker",
 			},
 			{
 				name: "description",
 				content:
-					"Monfolio is a legitimate, secure Web3 portfolio tracker for monitoring Ethereum transactions and token balances. Official blockchain analytics tool built with modern security practices. Not a financial service or trading platform.",
+					"Track and manage your cryptocurrency portfolio across Ethereum, Arbitrum, and Optimism test networks. View balances, transaction history, and token prices in one dashboard.",
 			},
 			{
 				name: "application-name",
-				content: "Monfolio Portfolio Tracker",
+				content: "Monfolio",
 			},
 			{
 				name: "robots",
 				content: "index, follow",
 			},
 			{
-				name: "classification",
-				content: "Blockchain Analytics Tool",
-			},
-			{
-				name: "category",
-				content: "Technology",
-			},
-			{
 				name: "keywords",
 				content:
-					"web3, ethereum, portfolio, tracker, cryptocurrency, blockchain, defi, wallet, transactions",
+					"web3, ethereum, portfolio, tracker, cryptocurrency, blockchain, defi, wallet, transactions, arbitrum, optimism",
 			},
 			{
 				name: "author",
@@ -64,7 +56,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				property: "og:description",
 				content:
-					"Secure Web3 portfolio tracker for monitoring Ethereum transactions and token balances",
+					"Track your cryptocurrency portfolio across multiple blockchain networks. View balances and transaction history.",
 			},
 			{
 				property: "og:type",
@@ -81,7 +73,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "twitter:description",
 				content:
-					"Secure Web3 portfolio tracker for monitoring Ethereum transactions and token balances",
+					"Track your cryptocurrency portfolio across multiple blockchain networks",
 			},
 		],
 		links: [

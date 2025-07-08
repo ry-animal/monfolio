@@ -12,7 +12,8 @@ const app = new Hono();
 app.use(logger());
 
 // Add security headers only in production
-const isProduction = env.NODE_ENV === "production" || env.CORS_ORIGIN?.includes("pages.dev");
+const isProduction =
+	env.NODE_ENV === "production" || env.CORS_ORIGIN?.includes("pages.dev");
 if (isProduction) {
 	app.use(
 		"/*",

@@ -5,7 +5,7 @@ import { formatCurrency } from "../lib/format-utils";
 import { CHAIN_EXPLORERS } from "../lib/web3";
 import { trpc } from "../utils/trpc";
 import { BalanceDisplay } from "./balance-display";
-import { BodyL, BodyS, CaptionL, H1, H6 } from "./design-system";
+import { BodyL, BodyS, H1, H6 } from "./design-system";
 import { NetworkSelector } from "./network-selector";
 import { TransactionHistory } from "./transaction-history";
 import { AddressDisplay } from "./ui/address-display";

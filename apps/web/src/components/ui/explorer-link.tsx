@@ -22,7 +22,7 @@ export function ExplorerLink({
 		<a
 			href={href}
 			target="_blank"
-			rel="noopener noreferrer"
+			rel="noopener noreferrer nofollow"
 			className={`inline-flex items-center gap-1 font-mono text-blue-600 hover:underline ${className}`}
 		>
 			{children}

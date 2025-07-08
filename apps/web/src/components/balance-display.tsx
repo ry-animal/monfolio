@@ -191,7 +191,7 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 												<a
 													href={getExplorerLink(token.chainId)}
 													target="_blank"
-													rel="noopener noreferrer"
+													rel="noopener noreferrer nofollow"
 													className="inline-flex items-center justify-center rounded p-1 hover:bg-muted"
 												>
 													<ExternalLink className="size-4" />

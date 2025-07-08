@@ -73,7 +73,7 @@ export function AddressDisplay({
 							<a
 								href={explorerUrl}
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener noreferrer nofollow"
 								className="cursor-pointer rounded p-1 hover:bg-muted"
 							>
 								<ExternalLink className="size-3" />

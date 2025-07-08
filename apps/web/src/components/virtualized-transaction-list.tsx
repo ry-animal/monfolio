@@ -110,7 +110,7 @@ export function VirtualizedTransactionList({
 												<a
 													href={getExplorerLink(tx.from, tx.chainId, "address")}
 													target="_blank"
-													rel="noopener noreferrer"
+													rel="noopener noreferrer nofollow"
 													className="font-mono text-blue-600 hover:underline"
 												>
 													{formatAddress(tx.from)}
@@ -128,7 +128,7 @@ export function VirtualizedTransactionList({
 												<a
 													href={getExplorerLink(tx.to, tx.chainId, "address")}
 													target="_blank"
-													rel="noopener noreferrer"
+													rel="noopener noreferrer nofollow"
 													className="font-mono text-blue-600 hover:underline"
 												>
 													{formatAddress(tx.to)}
@@ -147,7 +147,7 @@ export function VirtualizedTransactionList({
 											<a
 												href={getExplorerLink(tx.hash, tx.chainId, "tx")}
 												target="_blank"
-												rel="noopener noreferrer"
+												rel="noopener noreferrer nofollow"
 												className="font-mono text-blue-600 hover:underline"
 											>
 												{formatAddress(tx.hash)}
