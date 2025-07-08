@@ -1,6 +1,6 @@
 import { Copy, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CaptionL } from "../design-system";
+import { BodyS, H6 } from "../design-system";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 interface AddressDisplayProps {
@@ -24,7 +24,7 @@ export function AddressDisplay({
 	const [tooltipOpen, setTooltipOpen] = useState(false);
 
 	const formatAddress = (addr: string) => {
-		return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+		return `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 	};
 
 	const handleCopy = () => {
@@ -36,7 +36,6 @@ export function AddressDisplay({
 		}, 2000);
 	};
 
-	// Reset copied state when tooltip closes
 	useEffect(() => {
 		if (!tooltipOpen && copied) {
 			setCopied(false);
@@ -46,12 +45,12 @@ export function AddressDisplay({
 	return (
 		<div className={className}>
 			{label && (
-				<CaptionL color="secondary" className="mb-1">
+				<BodyS color="secondary" className="mb-1">
 					{label}
-				</CaptionL>
+				</BodyS>
 			)}
 			<div className="flex items-center gap-2">
-				<span className="font-mono text-sm">{formatAddress(address)}</span>
+				<H6 weight="bold">{formatAddress(address)}</H6>
 				{showCopy && (
 					<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
 						<TooltipTrigger asChild>

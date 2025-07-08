@@ -56,7 +56,7 @@ function RootComponent() {
 						style={{
 							backgroundImage: `url('/N&T.png'), url('/LS.png'), url('/SS.png')`,
 							backgroundRepeat: "repeat, no-repeat, no-repeat",
-							backgroundPosition: "0 0, 0 0, 100% 125%",
+							backgroundPosition: "0 0, -30% 0, 100% 125%",
 							backgroundSize: "auto, contain, 40%",
 						}}
 					/>

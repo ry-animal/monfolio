@@ -19,10 +19,10 @@ export function TabButton({
 			type="button"
 			onClick={onClick}
 			className={cn(
-				"pb-2 transition-colors",
+				"rounded-lg border px-4 py-2 transition-all duration-200",
 				isActive
-					? "border-monad-purple border-b-2 font-medium"
-					: "text-muted-foreground hover:text-foreground",
+					? "border-border bg-background shadow-sm"
+					: "border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40 hover:bg-muted/50 hover:text-foreground",
 				className,
 			)}
 		>

@@ -33,8 +33,11 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 		{ enabled: !!address },
 	);
 
+	const tokenPrices = trpc.getTokenPrices.useQuery();
+
 	const allBalances = [sepoliaBalance, arbitrumBalance, optimismBalance];
-	const isLoading = allBalances.some((balance) => balance.isLoading);
+	const isLoading =
+		allBalances.some((balance) => balance.isLoading) || tokenPrices.isLoading;
 
 	const tokenBalances = allBalances.flatMap((balance, index) => {
 		const network = SUPPORTED_NETWORKS[index];
@@ -78,6 +81,29 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 		return baseUrl ? `${baseUrl}/address/${address}` : "#";
 	};
 
+	const getTokenFullName = (token: string) => {
+		switch (token) {
+			case "ETH":
+				return "Ether";
+			case "USDC":
+				return "USD Coin";
+			default:
+				return token;
+		}
+	};
+
+	const getTokenPrice = (token: string) => {
+		if (!tokenPrices.data) return "-";
+
+		if (token === "ETH") {
+			return `$${tokenPrices.data.ethereum.usd.toLocaleString()}`;
+		}
+		if (token === "USDC") {
+			return `$${tokenPrices.data["usd-coin"].usd.toFixed(2)}`;
+		}
+		return "-";
+	};
+
 	return (
 		<div className="space-y-4">
 			{isLoading ? (
@@ -107,52 +133,79 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 					No balances found
 				</div>
 			) : (
-				<div className="space-y-3">
-					{sortedTokens.map((token, index) => (
-						<div
-							key={`${token.token}-${token.chainId}-${index}`}
-							className="flex items-center justify-between rounded-lg border bg-card p-4"
-						>
-							<div className="flex items-center gap-3">
-								<TokenIcon
-									token={token.token as "ETH" | "USDC"}
-									networkId={token.chainId}
-									size="md"
-								/>
-								<div>
-									<div className="font-medium">{token.token}</div>
-									<div className="text-muted-foreground text-sm">
-										{token.network}
-									</div>
-								</div>
-							</div>
-							<div className="text-right">
-								<div className="font-medium">
-									{token.token === "ETH"
-										? `${token.balance.toFixed(4)} ETH`
-										: `${token.balance.toFixed(2)} USDC`}
-								</div>
-								<div className="text-muted-foreground text-sm">
-									${token.usdValue.toFixed(2)}
-								</div>
-							</div>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<a
-										href={getExplorerLink(token.chainId)}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="ml-3 rounded p-1 hover:bg-muted"
-									>
-										<ExternalLink className="size-4" />
-									</a>
-								</TooltipTrigger>
-								<TooltipContent>
-									View wallet on {token.network} explorer
-								</TooltipContent>
-							</Tooltip>
-						</div>
-					))}
+				<div className="overflow-hidden rounded-lg">
+					<table className="w-1/2">
+						<thead>
+							<tr>
+								<th className="px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Token
+								</th>
+								<th className="px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Price
+								</th>
+								<th className="px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Balance
+								</th>
+								<th className="w-12 px-4 py-3" />
+							</tr>
+						</thead>
+						<tbody>
+							{sortedTokens.map((token, index) => (
+								<tr
+									key={`${token.token}-${token.chainId}-${index}`}
+									className="transition-colors hover:bg-muted/25"
+								>
+									<td className="px-4 py-3">
+										<div className="flex items-center gap-3">
+											<TokenIcon
+												token={token.token as "ETH" | "USDC"}
+												networkId={token.chainId}
+												size="md"
+											/>
+											<div>
+												<div className="font-medium">{token.token}</div>
+												<div className="text-muted-foreground text-sm">
+													{getTokenFullName(token.token)}
+												</div>
+											</div>
+										</div>
+									</td>
+									<td className="px-4 py-3">
+										<div className="font-medium">
+											{getTokenPrice(token.token)}
+										</div>
+									</td>
+									<td className="px-4 py-3">
+										<div className="font-medium">
+											${token.usdValue.toFixed(2)}
+										</div>
+										<div className="text-muted-foreground text-sm">
+											{token.token === "ETH"
+												? `${token.balance.toFixed(4)} ETH`
+												: `${token.balance.toFixed(2)} USDC`}
+										</div>
+									</td>
+									<td className="px-4 py-3">
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<a
+													href={getExplorerLink(token.chainId)}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="inline-flex items-center justify-center rounded p-1 hover:bg-muted"
+												>
+													<ExternalLink className="size-4" />
+												</a>
+											</TooltipTrigger>
+											<TooltipContent>
+												View wallet on {token.network} explorer
+											</TooltipContent>
+										</Tooltip>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
 				</div>
 			)}
 		</div>

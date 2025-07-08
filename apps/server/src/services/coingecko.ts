@@ -9,16 +9,43 @@ export interface PriceData {
 }
 
 // Cache to avoid hitting rate limits
-const _priceCache: { data: PriceData; timestamp: number } | null = null;
+let _priceCache: { data: PriceData; timestamp: number } | null = null;
 const _CACHE_DURATION = 60000; // 1 minute cache
 
 export async function fetchTokenPrices(): Promise<PriceData> {
-	// Always return fallback prices to avoid API errors
-	const fallbackData: PriceData = {
-		ethereum: { usd: 2400, last_updated_at: Date.now() / 1000 },
-		"usd-coin": { usd: 1, last_updated_at: Date.now() / 1000 },
-	};
-	return fallbackData;
+	// Check cache first
+	if (_priceCache && Date.now() - _priceCache.timestamp < _CACHE_DURATION) {
+		return _priceCache.data;
+	}
+
+	try {
+		const response = await fetch(
+			"https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd&include_last_updated_at=true",
+		);
+
+		if (!response.ok) {
+			throw new Error(`CoinGecko API error: ${response.status}`);
+		}
+
+		const data: PriceData = await response.json();
+
+		// Cache the result
+		_priceCache = {
+			data,
+			timestamp: Date.now(),
+		};
+
+		return data;
+	} catch (error) {
+		console.error("Failed to fetch token prices from CoinGecko:", error);
+
+		// Return fallback prices if API fails
+		const fallbackData: PriceData = {
+			ethereum: { usd: 2553.17, last_updated_at: Date.now() / 1000 },
+			"usd-coin": { usd: 0.9999, last_updated_at: Date.now() / 1000 },
+		};
+		return fallbackData;
+	}
 }
 
 export function calculateUsdValue(

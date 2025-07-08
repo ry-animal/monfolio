@@ -5,7 +5,7 @@ import { formatCurrency } from "../lib/format-utils";
 import { CHAIN_EXPLORERS } from "../lib/web3";
 import { trpc } from "../utils/trpc";
 import { BalanceDisplay } from "./balance-display";
-import { BodyL, CaptionL, H1, H5 } from "./design-system";
+import { BodyL, BodyS, CaptionL, H1, H6 } from "./design-system";
 import { NetworkSelector } from "./network-selector";
 import { TransactionHistory } from "./transaction-history";
 import { AddressDisplay } from "./ui/address-display";
@@ -24,7 +24,6 @@ export function Dashboard() {
 		sepolia.id,
 	]);
 
-	// Get total balance across all networks
 	const sepoliaBalance = trpc.getBalance.useQuery(
 		{ address: address as string, chainId: sepolia.id },
 		{ enabled: !!address },
@@ -87,45 +86,47 @@ export function Dashboard() {
 		<div className="container mx-auto space-y-8 px-4 py-8">
 			<div className="flex items-start justify-between">
 				<div className="space-y-4">
-					<H1 color="monad-purple" weight="bold">
+					<H1 color="monad-purple" weight="bold" className="mb-12">
 						Monfolio
 					</H1>
 				</div>
 			</div>
 
-			<div className="flex flex-col gap-4 md:flex-row md:gap-12">
+			<div className="mb-12 flex flex-col gap-4 md:flex-row md:gap-12">
 				<AddressDisplay
 					address={address || ""}
 					label="Address"
 					explorerUrl={getExplorerLink(address || "")}
 				/>
 				<div>
-					<CaptionL color="secondary" className="mb-1">
-						Total Balance
-					</CaptionL>
-					<H5 weight="bold">{formatCurrency(totalBalance)}</H5>
+					<BodyS className="mb-1">Total Balance</BodyS>
+					<H6 weight="bold">{formatCurrency(totalBalance)}</H6>
 				</div>
 			</div>
 
-			<div className="flex gap-8 border-b">
+			<div className="mb-12 inline-flex gap-4 rounded-xl border border-muted-foreground/20 bg-muted/30 p-1">
 				<TabButton
 					isActive={activeTab === "balances"}
 					onClick={() => setActiveTab("balances")}
+					className="cursor-pointer"
 				>
 					Balances
 				</TabButton>
 				<TabButton
 					isActive={activeTab === "transactions"}
 					onClick={() => setActiveTab("transactions")}
+					className="cursor-pointer"
 				>
 					Past Transactions
 				</TabButton>
 			</div>
 
 			{activeTab === "balances" ? (
-				<div className="space-y-4">
-					<H5>Balances</H5>
-					<div className="w-64">
+				<div className="mb-12 space-y-4">
+					<H6 weight="bold" className="mb-4">
+						Balances
+					</H6>
+					<div className="mb-4 w-64">
 						<NetworkSelector
 							selectedNetworks={selectedNetworks}
 							onNetworkChange={setSelectedNetworks}
@@ -135,8 +136,8 @@ export function Dashboard() {
 				</div>
 			) : (
 				<div className="space-y-4">
-					<H5>Past Transactions</H5>
-					<div className="w-64">
+					<H6 weight="bold">Past Transactions</H6>
+					<div className="mb-4 w-64">
 						<NetworkSelector
 							selectedNetworks={transactionNetworks}
 							onNetworkChange={setTransactionNetworks}

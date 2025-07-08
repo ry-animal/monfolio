@@ -88,7 +88,7 @@ export function NetworkSelector({
 							<img
 								src={network.icon}
 								alt={network.name}
-								className="w-5 h-5 rounded-full"
+								className="h-5 w-5 rounded-full"
 							/>
 							<span>{network.name}</span>
 						</div>

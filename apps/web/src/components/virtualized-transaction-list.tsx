@@ -53,7 +53,7 @@ export function VirtualizedTransactionList({
 	return (
 		<div
 			ref={parentRef}
-			className="h-[600px] overflow-auto" // Fixed height for virtualization
+			className="h-[600px] overflow-auto"
 		>
 			<div
 				style={{
@@ -89,7 +89,7 @@ export function VirtualizedTransactionList({
 										<div className="flex flex-col">
 											<span className="font-medium">{tx.token}</span>
 											{networkInfo && (
-												<span className="text-xs text-muted-foreground">
+												<span className="text-muted-foreground text-xs">
 													{networkInfo.name}
 												</span>
 											)}

@@ -4,7 +4,7 @@ import { ModeToggle } from "./mode-toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default function Header() {
-	const { isConnected } = useAccount();
+	const { address, isConnected } = useAccount();
 	const { disconnect } = useDisconnect();
 
 	return (
@@ -12,18 +12,24 @@ export default function Header() {
 			<div className="flex flex-row items-center justify-end px-2 py-4">
 				<div className="flex items-center gap-2">
 					{isConnected && (
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={() => disconnect()}
-									className="cursor-pointer rounded p-1 hover:bg-muted"
-								>
-									<LogOut className="size-4" aria-label="Disconnect wallet" />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent>Disconnect wallet</TooltipContent>
-						</Tooltip>
+						<>
+							<div>
+								{address?.slice(0, 4)}...{address?.slice(-4)}
+							</div>
+
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type="button"
+										onClick={() => disconnect()}
+										className="cursor-pointer rounded p-1 hover:bg-gray-100"
+									>
+										<LogOut className="size-4" aria-label="Disconnect wallet" />
+									</button>
+								</TooltipTrigger>
+								<TooltipContent>Disconnect wallet</TooltipContent>
+							</Tooltip>
+						</>
 					)}
 					<ModeToggle />
 				</div>

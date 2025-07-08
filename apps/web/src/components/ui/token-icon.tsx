@@ -52,25 +52,31 @@ export function TokenIcon({
 }: TokenIconProps) {
 	const config = SIZE_CONFIGS[size];
 	const tokenIcon = TOKEN_ICONS[token];
-	const networkIcon = networkId ? NETWORK_ICONS[networkId as keyof typeof NETWORK_ICONS] : null;
-	const networkLabel = networkId ? NETWORK_LABELS[networkId as keyof typeof NETWORK_LABELS] : null;
+	const networkIcon = networkId
+		? NETWORK_ICONS[networkId as keyof typeof NETWORK_ICONS]
+		: null;
+	const networkLabel = networkId
+		? NETWORK_LABELS[networkId as keyof typeof NETWORK_LABELS]
+		: null;
 
 	return (
 		<div className={cn("relative", config.container, className)}>
 			{/* Main token icon */}
-			<div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-gray-100">
+			<div className="h-full w-full overflow-hidden rounded-full bg-white dark:bg-gray-100">
 				{tokenIcon ? (
 					<img
 						src={tokenIcon}
 						alt={token}
-						className="w-full h-full object-cover"
+						className="h-full w-full object-cover"
 					/>
 				) : (
-					<div className={cn(
-						"w-full h-full rounded-full flex items-center justify-center",
-						token === "ETH" ? "bg-blue-500" : "bg-blue-600"
-					)}>
-						<span className="text-white font-bold">
+					<div
+						className={cn(
+							"flex h-full w-full items-center justify-center rounded-full",
+							token === "ETH" ? "bg-blue-500" : "bg-blue-600",
+						)}
+					>
+						<span className="font-bold text-white">
 							{token === "ETH" ? "Ξ" : "$"}
 						</span>
 					</div>
@@ -81,20 +87,20 @@ export function TokenIcon({
 			{networkId && (
 				<div
 					className={cn(
-						"absolute rounded-full bg-white dark:bg-gray-900 p-px border border-gray-200 dark:border-gray-700 shadow-sm",
+						"absolute rounded-full border border-gray-200 bg-white p-px shadow-sm dark:border-gray-700 dark:bg-gray-900",
 						config.badgeOffset,
 					)}
 				>
-					<div className={cn("rounded-full overflow-hidden", config.badge)}>
+					<div className={cn("overflow-hidden rounded-full", config.badge)}>
 						{networkIcon ? (
 							<img
 								src={networkIcon}
 								alt={networkLabel || "Network"}
-								className="w-full h-full object-cover"
+								className="h-full w-full object-cover"
 							/>
 						) : (
-							<div className="w-full h-full bg-gray-400 rounded-full flex items-center justify-center">
-								<span className="text-[10px] font-bold text-white">
+							<div className="flex h-full w-full items-center justify-center rounded-full bg-gray-400">
+								<span className="font-bold text-[10px] text-white">
 									{networkLabel?.slice(0, 2)}
 								</span>
 							</div>

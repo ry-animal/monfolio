@@ -85,11 +85,11 @@ export function TransactionHistory({
 			? [ethQuery]
 			: []),
 		...(selectedNetworks.length === 0 ||
-		selectedNetworks.includes(arbitrumSepolia.id)
+			selectedNetworks.includes(arbitrumSepolia.id)
 			? [arbQuery]
 			: []),
 		...(selectedNetworks.length === 0 ||
-		selectedNetworks.includes(optimismSepolia.id)
+			selectedNetworks.includes(optimismSepolia.id)
 			? [opQuery]
 			: []),
 	];
@@ -122,43 +122,9 @@ export function TransactionHistory({
 		return SUPPORTED_NETWORKS.find((n) => n.chain.id === chainId);
 	};
 
-	const renderTransactionSkeleton = () => (
-		<div className="space-y-2 rounded-lg border bg-card p-4">
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<Skeleton className="h-4 w-12" />
-					<Skeleton className="h-4 w-20" />
-				</div>
-				<Skeleton className="h-4 w-16" />
-			</div>
-			<div className="grid grid-cols-2 gap-4">
-				<div className="space-y-1">
-					<Skeleton className="h-3 w-8" />
-					<Skeleton className="h-4 w-24" />
-				</div>
-				<div className="space-y-1">
-					<Skeleton className="h-3 w-6" />
-					<Skeleton className="h-4 w-24" />
-				</div>
-			</div>
-			<div className="flex items-center justify-between">
-				<Skeleton className="h-4 w-32" />
-				<Skeleton className="h-4 w-20" />
-			</div>
-		</div>
-	);
-
 	return (
-		<div className="space-y-4">
+		<div>
 			<div className="flex items-center justify-between">
-				<CaptionL color="secondary">
-					{selectedNetworks.length === 0
-						? "No networks selected"
-						: selectedNetworks.length === 1
-							? `${SUPPORTED_NETWORKS.find((n) => n.chain.id === selectedNetworks[0])?.name || "Selected network"}`
-							: `${selectedNetworks.length} networks`}{" "}
-					• Last {limit} transactions
-				</CaptionL>
 				{isRefetching && (
 					<div className="flex items-center gap-2">
 						<div className="h-4 w-4 animate-spin rounded-full border-primary border-b-2" />
@@ -167,12 +133,9 @@ export function TransactionHistory({
 				)}
 			</div>
 
-			<div className="space-y-2">
+			<div>
 				<div className="flex items-center gap-4 text-sm">
 					<div className="flex items-center gap-2">
-						<CaptionL color="secondary" as="label" htmlFor="limit-select">
-							Show:
-						</CaptionL>
 						<select
 							id="limit-select"
 							value={limit}
@@ -207,109 +170,145 @@ export function TransactionHistory({
 				</div>
 			</div>
 
-			<div className="space-y-4">
-				{isLoading ? (
-					Array.from({ length: 3 }, (_, i) => (
-						<div key={`transaction-skeleton-${i + 1}`}>
-							{renderTransactionSkeleton()}
-						</div>
-					))
-				) : hasError ? (
-					<div className="gap-4 py-8 text-center">
-						<CaptionL color="secondary">Error loading transactions</CaptionL>
-						<Button
-							variant="outline"
-							size="sm"
-							className="mt-2"
-							onClick={() => transactionQueries.forEach((q) => q.refetch())}
-						>
-							Try Again
-						</Button>
-					</div>
-				) : allTransactions.length === 0 ? (
-					<div className="gap-4 py-8 text-center">
-						<CaptionL color="secondary">No transactions found</CaptionL>
-						<CaptionM color="secondary" className="mt-1">
-							{address
-								? "Try connecting to a different network or making some transactions"
-								: "Connect your wallet to view transactions"}
-						</CaptionM>
-					</div>
-				) : shouldUseVirtualization && useVirtualization ? (
-					<VirtualizedTransactionList
-						transactions={allTransactions}
-						getNetworkInfo={getNetworkInfo}
-						formatAddress={formatAddress}
-						formatDate={formatDate}
-						getExplorerLink={getExplorerLink}
-					/>
-				) : (
-					allTransactions.map((tx) => {
-						const networkInfo = getNetworkInfo(tx.chainId);
-						return (
-							<div
-								key={`${tx.hash}-${tx.chainId}`}
-								className="space-y-2 rounded-lg border bg-card p-4"
-							>
+			{isLoading ? (
+				<div className="space-y-3">
+					{Array.from({ length: 3 }, (_, i) => (
+						<div key={`skeleton-${i + 1}`} className="overflow-hidden rounded-lg">
+							<div className="px-4 py-3">
 								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-2">
-										<TokenIcon
-											token={tx.token as "ETH" | "USDC"}
-											networkId={tx.chainId}
-											size="sm"
-										/>
-										<div className="flex flex-col">
-											<span className="font-medium">{tx.token}</span>
-											{networkInfo && (
-												<span className="text-xs text-muted-foreground">
-													{networkInfo.name}
-												</span>
-											)}
+									<div className="flex items-center gap-3">
+										<Skeleton className="h-6 w-6 rounded-full" />
+										<div>
+											<Skeleton className="mb-1 h-4 w-12" />
+											<Skeleton className="h-3 w-20" />
 										</div>
-										<CaptionL color="secondary">
-											{formatDate(tx.timestamp * 1000)}
-										</CaptionL>
 									</div>
-									<CaptionL className="font-mono">
-										{formatTokenAmount(tx.amount, tx.token)}
-									</CaptionL>
-								</div>
-
-								<div className="grid grid-cols-2 gap-4">
-									<div>
-										<CaptionL color="secondary">From</CaptionL>
-										<ExplorerLink
-											href={getExplorerLink(tx.from, tx.chainId, "address")}
-											className="text-sm"
-										>
-											{formatAddress(tx.from)}
-										</ExplorerLink>
+									<div className="flex items-center gap-4">
+										<Skeleton className="h-4 w-16" />
+										<Skeleton className="h-4 w-16" />
+										<Skeleton className="h-4 w-16" />
+										<Skeleton className="h-4 w-16" />
+										<Skeleton className="h-4 w-16" />
+										<Skeleton className="h-4 w-16" />
 									</div>
-									<div>
-										<CaptionL color="secondary">To</CaptionL>
-										<ExplorerLink
-											href={getExplorerLink(tx.to, tx.chainId, "address")}
-											className="text-sm"
-										>
-											{formatAddress(tx.to)}
-										</ExplorerLink>
-									</div>
-								</div>
-
-								<div className="flex items-center justify-between">
-									<ExplorerLink
-										href={getExplorerLink(tx.hash, tx.chainId, "tx")}
-										className="text-sm"
-									>
-										{formatAddress(tx.hash)}
-									</ExplorerLink>
-									<CaptionL color="secondary">Block #{tx.blockNumber}</CaptionL>
 								</div>
 							</div>
-						);
-					})
-				)}
-			</div>
+						</div>
+					))}
+				</div>
+			) : hasError ? (
+				<div className="gap-4 py-8 text-center">
+					<CaptionL color="secondary">Error loading transactions</CaptionL>
+					<Button
+						variant="outline"
+						size="sm"
+						className="mt-2"
+						onClick={() => transactionQueries.forEach((q) => q.refetch())}
+					>
+						Try Again
+					</Button>
+				</div>
+			) : allTransactions.length === 0 ? (
+				<div className="gap-4 py-8 text-center">
+					<CaptionL color="secondary">No transactions found</CaptionL>
+					<CaptionM color="secondary" className="mt-1">
+						{address
+							? "Try connecting to a different network or making some transactions"
+							: "Connect your wallet to view transactions"}
+					</CaptionM>
+				</div>
+			) : shouldUseVirtualization && useVirtualization ? (
+				<VirtualizedTransactionList
+					transactions={allTransactions}
+					getNetworkInfo={getNetworkInfo}
+					formatAddress={formatAddress}
+					formatDate={formatDate}
+					getExplorerLink={getExplorerLink}
+				/>
+			) : (
+				<div className="overflow-x-auto rounded-lg">
+					<table className="w-full min-w-[800px]">
+						<thead>
+							<tr>
+								<th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Date
+								</th>
+								<th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									From
+								</th>
+								<th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									To
+								</th>
+								<th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Amount
+								</th>
+								<th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Token
+								</th>
+								<th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground text-sm">
+									Transaction Hash
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{allTransactions.map((tx) => {
+								const networkInfo = getNetworkInfo(tx.chainId);
+								return (
+									<tr
+										key={`${tx.hash}-${tx.chainId}`}
+										className="transition-colors hover:bg-muted/25"
+									>
+										<td className="whitespace-nowrap px-4 py-3">
+											<div className="font-medium">
+												{formatDate(tx.timestamp * 1000)}
+											</div>
+										</td>
+										<td className="whitespace-nowrap px-4 py-3">
+											<ExplorerLink
+												href={getExplorerLink(tx.from, tx.chainId, "address")}
+												className="font-mono text-sm hover:underline"
+											>
+												{formatAddress(tx.from)}
+											</ExplorerLink>
+										</td>
+										<td className="whitespace-nowrap px-4 py-3">
+											<ExplorerLink
+												href={getExplorerLink(tx.to, tx.chainId, "address")}
+												className="font-mono text-sm hover:underline"
+											>
+												{formatAddress(tx.to)}
+											</ExplorerLink>
+										</td>
+										<td className="whitespace-nowrap px-4 py-3">
+											<div className="font-medium">
+												{formatTokenAmount(tx.amount, tx.token)}
+											</div>
+										</td>
+										<td className="whitespace-nowrap px-4 py-3">
+											<div className="flex items-center gap-2">
+												<TokenIcon
+													token={tx.token as "ETH" | "USDC"}
+													networkId={tx.chainId}
+													size="sm"
+												/>
+												<div className="font-medium">{tx.token}</div>
+											</div>
+										</td>
+										<td className="whitespace-nowrap px-4 py-3">
+											<ExplorerLink
+												href={getExplorerLink(tx.hash, tx.chainId, "tx")}
+												className="font-mono text-sm hover:underline"
+											>
+												{formatAddress(tx.hash)}
+											</ExplorerLink>
+										</td>
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
+			)}
 		</div>
 	);
 }
