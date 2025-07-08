@@ -1,6 +1,6 @@
 # Monfolio
 
-🚀 **[Live Production Site](https://monad-takehome.ry-animal.workers.dev)**
+🚀 **[Live Production Site](https://monad-takehome.pages.dev/)**
 
 A crypto portfolio tracker built with modern web technologies. Track and manage your crypto and NFT portfolio across Ethereum, Arbitrum, and Optimism testnets.
 
