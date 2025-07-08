@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Monfolio - Web3 Portfolio Tracker
+# A legitimate cryptocurrency portfolio management application
+# Built with React, TypeScript, and Web3 technologies
+
+Sitemap: https://monad-takehome.pages.dev/sitemap.xml
