@@ -39,7 +39,11 @@ export const appRouter: ReturnType<typeof router> = router({
 					});
 				}
 
-				const balance = await fetchBalance(address, chainId as ChainId, ctx.env);
+				const balance = await fetchBalance(
+					address,
+					chainId as ChainId,
+					ctx.env,
+				);
 				const prices = await fetchTokenPrices();
 
 				const ethUsdValue = calculateUsdValue(

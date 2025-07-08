@@ -1,5 +1,7 @@
 # Monfolio
 
+[![Deploy to Production](https://github.com/username/monad-takehome/actions/workflows/deploy-production.yml/badge.svg)](https://github.com/username/monad-takehome/actions/workflows/deploy-production.yml)
+
 A crypto portfolio tracker built with modern web technologies. Track and manage your crypto and NFT portfolio across Ethereum, Arbitrum, and Optimism testnets.
 
 ## Features
