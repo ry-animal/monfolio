@@ -2,15 +2,3 @@ Contact: security@monad-takehome.pages.dev
 Expires: 2026-01-01T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://monad-takehome.pages.dev/.well-known/security.txt
-
-# Security Policy
-# 
-# Application: Monfolio Web3 Portfolio Tracker
-# Purpose: Cryptocurrency portfolio visualization and tracking
-# Technology Stack: React, TypeScript, tRPC, Cloudflare Workers
-#
-# This application:
-# - Provides read-only blockchain data visualization
-# - Does not store private keys or seed phrases
-# - Does not process transactions
-# - Only accesses publicly available blockchain data

@@ -30,7 +30,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "description",
 				content:
-					"Track and manage your cryptocurrency portfolio across Ethereum, Arbitrum, and Optimism test networks. View balances, transaction history, and token prices in one dashboard.",
+					"Track and manage your digital asset portfolio across multiple networks. View balances, transaction history, and analytics in one dashboard.",
 			},
 			{
 				name: "application-name",
@@ -43,7 +43,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "keywords",
 				content:
-					"web3, ethereum, portfolio, tracker, cryptocurrency, blockchain, defi, wallet, transactions, arbitrum, optimism",
+					"portfolio, tracker, dashboard, analytics, finance",
 			},
 			{
 				name: "author",
@@ -56,7 +56,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				property: "og:description",
 				content:
-					"Track your cryptocurrency portfolio across multiple blockchain networks. View balances and transaction history.",
+					"Track your digital asset portfolio across multiple networks. View balances and transaction history.",
 			},
 			{
 				property: "og:type",
@@ -73,7 +73,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			{
 				name: "twitter:description",
 				content:
-					"Track your cryptocurrency portfolio across multiple blockchain networks",
+					"Track your digital asset portfolio across multiple networks",
 			},
 		],
 		links: [
