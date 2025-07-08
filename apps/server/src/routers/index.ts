@@ -7,7 +7,8 @@ import {
 	getTransactionHistory,
 	getTransactionHistoryCursor,
 } from "../db/helpers";
-import { publicProcedure, router } from "../lib/trpc";
+import { publicProcedure, restrictedProcedure, router } from "../lib/trpc";
+import { chainIdSchema, ethereumAddressSchema } from "../lib/validation";
 import {
 	CHAIN_CONFIG,
 	type ChainId,
@@ -24,8 +25,8 @@ export const appRouter: ReturnType<typeof router> = router({
 	getBalance: publicProcedure
 		.input(
 			z.object({
-				address: z.string().min(1, "Address is required"),
-				chainId: z.number().positive("Chain ID must be positive"),
+				address: ethereumAddressSchema,
+				chainId: chainIdSchema,
 			}),
 		)
 		.query(async ({ input, ctx }) => {
@@ -77,11 +78,11 @@ export const appRouter: ReturnType<typeof router> = router({
 			}
 		}),
 
-	getTransactions: publicProcedure
+	getTransactions: restrictedProcedure
 		.input(
 			z.object({
-				address: z.string().min(1, "Address is required"),
-				chainId: z.number().positive("Chain ID must be positive").optional(),
+				address: ethereumAddressSchema,
+				chainId: chainIdSchema.optional(),
 				limit: z
 					.number()
 					.min(1, "Limit must be at least 1")
@@ -242,8 +243,8 @@ export const appRouter: ReturnType<typeof router> = router({
 	getTransactionCount: publicProcedure
 		.input(
 			z.object({
-				address: z.string().min(1, "Address is required"),
-				chainId: z.number().positive("Chain ID must be positive"),
+				address: ethereumAddressSchema,
+				chainId: chainIdSchema,
 			}),
 		)
 		.query(async ({ input, ctx }) => {

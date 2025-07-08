@@ -1,4 +1,4 @@
-import { and, count, desc, eq, lt, max, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, lt, max } from "drizzle-orm";
 import { db } from "./index";
 import { transactions } from "./schema";
 
@@ -140,7 +140,7 @@ export async function getTransactionHistoryMultiAddress(
 		.where(
 			and(
 				eq(transactions.chainId, chainId),
-				sql`${transactions.address} IN (${addresses.map((a) => `'${a}'`).join(", ")})`,
+				inArray(transactions.address, addresses),
 			),
 		)
 		.orderBy(desc(transactions.timestamp), desc(transactions.blockNumber))

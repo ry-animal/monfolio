@@ -25,11 +25,47 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
 		meta: [
 			{
-				title: "Monfolio",
+				title: "Monfolio - Web3 Portfolio Tracker",
 			},
 			{
 				name: "description",
-				content: "Monfolio",
+				content:
+					"Monfolio is a secure Web3 portfolio tracker that helps you monitor your Ethereum transactions and token balances. Built with modern security practices for cryptocurrency portfolio management.",
+			},
+			{
+				name: "keywords",
+				content:
+					"web3, ethereum, portfolio, tracker, cryptocurrency, blockchain, defi, wallet, transactions",
+			},
+			{
+				name: "author",
+				content: "Monfolio Team",
+			},
+			{
+				property: "og:title",
+				content: "Monfolio - Web3 Portfolio Tracker",
+			},
+			{
+				property: "og:description",
+				content:
+					"Secure Web3 portfolio tracker for monitoring Ethereum transactions and token balances",
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: "Monfolio - Web3 Portfolio Tracker",
+			},
+			{
+				name: "twitter:description",
+				content:
+					"Secure Web3 portfolio tracker for monitoring Ethereum transactions and token balances",
 			},
 		],
 		links: [

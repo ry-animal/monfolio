@@ -26,5 +26,7 @@ database_id = "07884dec-69ee-47a0-bb7b-6eaca8d5b041"
 
 [vars]
 CORS_ORIGIN = "http://localhost:3001"
-ETHERSCAN_API_KEY = "12V22ETKMJ7GEXAT3AUJ5IM72FH4E75BKH"
-COINGECKO_API_KEY = "CG-ieGkS5rcc56wdvdH3m8a2gjL"
+
+# API keys moved to Cloudflare Workers secrets for security
+# Use: wrangler secret put ETHERSCAN_API_KEY
+# Use: wrangler secret put COINGECKO_API_KEY

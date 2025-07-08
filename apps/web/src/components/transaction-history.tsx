@@ -85,11 +85,11 @@ export function TransactionHistory({
 			? [ethQuery]
 			: []),
 		...(selectedNetworks.length === 0 ||
-			selectedNetworks.includes(arbitrumSepolia.id)
+		selectedNetworks.includes(arbitrumSepolia.id)
 			? [arbQuery]
 			: []),
 		...(selectedNetworks.length === 0 ||
-			selectedNetworks.includes(optimismSepolia.id)
+		selectedNetworks.includes(optimismSepolia.id)
 			? [opQuery]
 			: []),
 	];

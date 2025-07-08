@@ -118,9 +118,23 @@ async function fetchNativeTransactions(
 	offset: number,
 ): Promise<BlockchainTransaction[]> {
 	const config = CHAIN_CONFIG[chainId];
-	const url = apiKey
-		? `${apiUrl}?module=account&action=txlist&address=${address}&page=${page}&offset=${offset}&sort=desc&chainid=${config.chainId}&apikey=${apiKey}`
-		: `${apiUrl}?module=account&action=txlist&address=${address}&page=${page}&offset=${offset}&sort=desc&chainid=${config.chainId}`;
+
+	// Use URLSearchParams for proper URL encoding
+	const params = new URLSearchParams({
+		module: "account",
+		action: "txlist",
+		address: address,
+		page: page.toString(),
+		offset: offset.toString(),
+		sort: "desc",
+		chainid: config.chainId.toString(),
+	});
+
+	if (apiKey) {
+		params.append("apikey", apiKey);
+	}
+
+	const url = `${apiUrl}?${params.toString()}`;
 
 	const response = await fetch(url);
 	const data = (await response.json()) as EtherscanResponse;
@@ -150,9 +164,24 @@ async function fetchTokenTransactions(
 	offset: number,
 ): Promise<BlockchainTransaction[]> {
 	const config = CHAIN_CONFIG[chainId];
-	const url = apiKey
-		? `${apiUrl}?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${offset}&sort=desc&chainid=${config.chainId}&apikey=${apiKey}`
-		: `${apiUrl}?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${offset}&sort=desc&chainid=${config.chainId}`;
+
+	// Use URLSearchParams for proper URL encoding
+	const params = new URLSearchParams({
+		module: "account",
+		action: "tokentx",
+		contractaddress: contractAddress,
+		address: address,
+		page: page.toString(),
+		offset: offset.toString(),
+		sort: "desc",
+		chainid: config.chainId.toString(),
+	});
+
+	if (apiKey) {
+		params.append("apikey", apiKey);
+	}
+
+	const url = `${apiUrl}?${params.toString()}`;
 
 	const response = await fetch(url);
 	const data = (await response.json()) as EtherscanResponse;
@@ -202,9 +231,20 @@ export async function fetchBalance(
 	try {
 		console.log(`Fetching balance for chain ${chainId}, address: ${address}`);
 
-		const ethBalanceUrl = apiKey
-			? `${config.balanceApiUrl}?module=account&action=balance&address=${address}&tag=latest&chainid=${config.chainId}&apikey=${apiKey}`
-			: `${config.balanceApiUrl}?module=account&action=balance&address=${address}&tag=latest&chainid=${config.chainId}`;
+		// Use URLSearchParams for proper URL encoding
+		const ethBalanceParams = new URLSearchParams({
+			module: "account",
+			action: "balance",
+			address: address,
+			tag: "latest",
+			chainid: config.chainId.toString(),
+		});
+
+		if (apiKey) {
+			ethBalanceParams.append("apikey", apiKey);
+		}
+
+		const ethBalanceUrl = `${config.balanceApiUrl}?${ethBalanceParams.toString()}`;
 
 		console.log(`ETH balance URL for chain ${chainId}: ${ethBalanceUrl}`);
 		const ethResponse = await fetch(ethBalanceUrl);
@@ -230,9 +270,21 @@ export async function fetchBalance(
 			return { eth: "0", usdc: "0" };
 		}
 
-		const usdcBalanceUrl = apiKey
-			? `${config.balanceApiUrl}?module=account&action=tokenbalance&contractaddress=${config.usdcAddress}&address=${address}&tag=latest&chainid=${config.chainId}&apikey=${apiKey}`
-			: `${config.balanceApiUrl}?module=account&action=tokenbalance&contractaddress=${config.usdcAddress}&address=${address}&tag=latest&chainid=${config.chainId}`;
+		// Use URLSearchParams for proper URL encoding
+		const usdcBalanceParams = new URLSearchParams({
+			module: "account",
+			action: "tokenbalance",
+			contractaddress: config.usdcAddress,
+			address: address,
+			tag: "latest",
+			chainid: config.chainId.toString(),
+		});
+
+		if (apiKey) {
+			usdcBalanceParams.append("apikey", apiKey);
+		}
+
+		const usdcBalanceUrl = `${config.balanceApiUrl}?${usdcBalanceParams.toString()}`;
 
 		console.log(`USDC balance URL for chain ${chainId}: ${usdcBalanceUrl}`);
 		const usdcResponse = await fetch(usdcBalanceUrl);
