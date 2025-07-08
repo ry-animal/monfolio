@@ -4,11 +4,13 @@ import { arbitrumSepolia, optimismSepolia, sepolia } from "wagmi/chains";
 import { CHAIN_EXPLORERS } from "../lib/web3";
 import { trpc } from "../utils/trpc";
 import { Skeleton } from "./ui/skeleton";
+import { TokenIcon } from "./ui/token-icon";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const SUPPORTED_NETWORKS = [
-	{ chain: sepolia, name: "Ethereum Sepolia", logo: "⚡" },
-	{ chain: arbitrumSepolia, name: "Arbitrum Sepolia", logo: "🔵" },
-	{ chain: optimismSepolia, name: "Optimism Sepolia", logo: "🔴" },
+	{ chain: sepolia, name: "Ethereum Sepolia" },
+	{ chain: arbitrumSepolia, name: "Arbitrum Sepolia" },
+	{ chain: optimismSepolia, name: "Optimism Sepolia" },
 ];
 
 interface BalanceDisplayProps {
@@ -18,7 +20,6 @@ interface BalanceDisplayProps {
 export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 	const { address } = useAccount();
 
-	// Get individual balance queries for each network
 	const sepoliaBalance = trpc.getBalance.useQuery(
 		{ address: address as string, chainId: sepolia.id },
 		{ enabled: !!address },
@@ -32,16 +33,13 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 		{ enabled: !!address },
 	);
 
-	// Collect all individual balances
 	const allBalances = [sepoliaBalance, arbitrumBalance, optimismBalance];
 	const isLoading = allBalances.some((balance) => balance.isLoading);
 
-	// Create individual token entries and filter by selected networks
 	const tokenBalances = allBalances.flatMap((balance, index) => {
 		const network = SUPPORTED_NETWORKS[index];
 		if (!balance.data) return [];
 
-		// Only include tokens from selected networks
 		if (
 			selectedNetworks.length > 0 &&
 			!selectedNetworks.includes(network.chain.id)
@@ -56,7 +54,6 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 				balance: Number.parseFloat(balance.data.eth) / 1e18,
 				usdValue: balance.data.ethUsd,
 				network: network.name,
-				networkLogo: network.logo,
 				chainId: network.chain.id,
 			});
 		}
@@ -66,14 +63,12 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 				balance: Number.parseFloat(balance.data.usdc) / 1e6,
 				usdValue: balance.data.usdcUsd,
 				network: network.name,
-				networkLogo: network.logo,
 				chainId: network.chain.id,
 			});
 		}
 		return tokens;
 	});
 
-	// Sort tokens by USD value (highest first)
 	const sortedTokens = [...tokenBalances].sort((a, b) => {
 		return b.usdValue - a.usdValue;
 	});
@@ -90,7 +85,7 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 					{Array.from({ length: 3 }, (_, i) => (
 						<div
 							key={`skeleton-${i}`}
-							className="flex items-center justify-between rounded-lg border p-4"
+							className="flex items-center justify-between rounded-lg border bg-card p-4"
 						>
 							<div className="flex items-center gap-3">
 								<Skeleton className="h-6 w-6 rounded-full" />
@@ -116,10 +111,14 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 					{sortedTokens.map((token, index) => (
 						<div
 							key={`${token.token}-${token.chainId}-${index}`}
-							className="flex items-center justify-between rounded-lg border p-4"
+							className="flex items-center justify-between rounded-lg border bg-card p-4"
 						>
 							<div className="flex items-center gap-3">
-								<span className="text-lg">{token.networkLogo}</span>
+								<TokenIcon
+									token={token.token as "ETH" | "USDC"}
+									networkId={token.chainId}
+									size="md"
+								/>
 								<div>
 									<div className="font-medium">{token.token}</div>
 									<div className="text-muted-foreground text-sm">
@@ -137,15 +136,21 @@ export function BalanceDisplay({ selectedNetworks = [] }: BalanceDisplayProps) {
 									${token.usdValue.toFixed(2)}
 								</div>
 							</div>
-							<a
-								href={getExplorerLink(token.chainId)}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="ml-3 rounded p-1 hover:bg-gray-100"
-								title="View on explorer"
-							>
-								<ExternalLink className="size-4" />
-							</a>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<a
+										href={getExplorerLink(token.chainId)}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="ml-3 rounded p-1 hover:bg-muted"
+									>
+										<ExternalLink className="size-4" />
+									</a>
+								</TooltipTrigger>
+								<TooltipContent>
+									View wallet on {token.network} explorer
+								</TooltipContent>
+							</Tooltip>
 						</div>
 					))}
 				</div>

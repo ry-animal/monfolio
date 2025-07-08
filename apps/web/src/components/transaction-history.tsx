@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { arbitrumSepolia, optimismSepolia, sepolia } from "wagmi/chains";
+import {
+	formatAddress,
+	formatDate,
+	formatTokenAmount,
+} from "../lib/format-utils";
 import { CHAIN_EXPLORERS } from "../lib/web3";
 import { trpc } from "../utils/trpc";
+import { CaptionL, CaptionM } from "./design-system";
 import { Button } from "./ui/button";
+import { ExplorerLink } from "./ui/explorer-link";
 import { Skeleton } from "./ui/skeleton";
+import { TokenIcon } from "./ui/token-icon";
 import { VirtualizedTransactionList } from "./virtualized-transaction-list";
 
 const SUPPORTED_NETWORKS = [
@@ -110,25 +118,12 @@ export function TransactionHistory({
 			: `${baseUrl}/address/${hash}`;
 	};
 
-	const formatDate = (timestamp: number) => {
-		return new Date(timestamp).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-	};
-
-	const formatAddress = (address: string) => {
-		return `${address.slice(0, 6)}...${address.slice(-4)}`;
-	};
-
 	const getNetworkInfo = (chainId: number) => {
 		return SUPPORTED_NETWORKS.find((n) => n.chain.id === chainId);
 	};
 
 	const renderTransactionSkeleton = () => (
-		<div className="space-y-2 rounded-lg border p-4">
+		<div className="space-y-2 rounded-lg border bg-card p-4">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Skeleton className="h-4 w-12" />
@@ -156,18 +151,18 @@ export function TransactionHistory({
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
-				<p className="text-muted-foreground text-sm">
+				<CaptionL color="secondary">
 					{selectedNetworks.length === 0
 						? "No networks selected"
 						: selectedNetworks.length === 1
 							? `${SUPPORTED_NETWORKS.find((n) => n.chain.id === selectedNetworks[0])?.name || "Selected network"}`
 							: `${selectedNetworks.length} networks`}{" "}
 					• Last {limit} transactions
-				</p>
+				</CaptionL>
 				{isRefetching && (
-					<div className="flex items-center gap-2 text-muted-foreground text-sm">
+					<div className="flex items-center gap-2">
 						<div className="h-4 w-4 animate-spin rounded-full border-primary border-b-2" />
-						Updating...
+						<CaptionL color="secondary">Updating...</CaptionL>
 					</div>
 				)}
 			</div>
@@ -175,14 +170,14 @@ export function TransactionHistory({
 			<div className="space-y-2">
 				<div className="flex items-center gap-4 text-sm">
 					<div className="flex items-center gap-2">
-						<label htmlFor="limit-select" className="text-muted-foreground">
+						<CaptionL color="secondary" as="label" htmlFor="limit-select">
 							Show:
-						</label>
+						</CaptionL>
 						<select
 							id="limit-select"
 							value={limit}
 							onChange={(e) => setLimit(Number.parseInt(e.target.value))}
-							className="rounded border px-2 py-1 text-sm"
+							className="rounded border bg-background px-2 py-1 text-foreground text-sm"
 						>
 							<option value={12}>12 items</option>
 							<option value={50}>50 items</option>
@@ -200,12 +195,13 @@ export function TransactionHistory({
 								onChange={(e) => setUseVirtualization(e.target.checked)}
 								className="rounded"
 							/>
-							<label
+							<CaptionL
+								color="secondary"
+								as="label"
 								htmlFor="virtualization-toggle"
-								className="text-muted-foreground"
 							>
 								Virtual scrolling ({allTransactions.length} items)
-							</label>
+							</CaptionL>
 						</div>
 					)}
 				</div>
@@ -219,8 +215,8 @@ export function TransactionHistory({
 						</div>
 					))
 				) : hasError ? (
-					<div className="py-8 text-center">
-						<p className="text-muted-foreground">Error loading transactions</p>
+					<div className="gap-4 py-8 text-center">
+						<CaptionL color="secondary">Error loading transactions</CaptionL>
 						<Button
 							variant="outline"
 							size="sm"
@@ -231,13 +227,13 @@ export function TransactionHistory({
 						</Button>
 					</div>
 				) : allTransactions.length === 0 ? (
-					<div className="py-8 text-center">
-						<p className="text-muted-foreground">No transactions found</p>
-						<p className="mt-1 text-muted-foreground text-sm">
+					<div className="gap-4 py-8 text-center">
+						<CaptionL color="secondary">No transactions found</CaptionL>
+						<CaptionM color="secondary" className="mt-1">
 							{address
 								? "Try connecting to a different network or making some transactions"
 								: "Connect your wallet to view transactions"}
-						</p>
+						</CaptionM>
 					</div>
 				) : shouldUseVirtualization && useVirtualization ? (
 					<VirtualizedTransactionList
@@ -253,64 +249,61 @@ export function TransactionHistory({
 						return (
 							<div
 								key={`${tx.hash}-${tx.chainId}`}
-								className="space-y-2 rounded-lg border p-4"
+								className="space-y-2 rounded-lg border bg-card p-4"
 							>
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-2">
-										<span className="font-medium">{tx.token}</span>
-										{networkInfo && (
-											<span className="rounded-full bg-muted px-2 py-1 text-xs">
-												{networkInfo.logo} {networkInfo.name}
-											</span>
-										)}
-										<span className="text-muted-foreground text-sm">
+										<TokenIcon
+											token={tx.token as "ETH" | "USDC"}
+											networkId={tx.chainId}
+											size="sm"
+										/>
+										<div className="flex flex-col">
+											<span className="font-medium">{tx.token}</span>
+											{networkInfo && (
+												<span className="text-xs text-muted-foreground">
+													{networkInfo.name}
+												</span>
+											)}
+										</div>
+										<CaptionL color="secondary">
 											{formatDate(tx.timestamp * 1000)}
-										</span>
+										</CaptionL>
 									</div>
-									<span className="font-mono text-sm">
-										{tx.token === "ETH"
-											? `${(Number.parseFloat(tx.amount) / 1e18).toFixed(4)} ${tx.token}`
-											: `${(Number.parseFloat(tx.amount) / 1e6).toFixed(2)} ${tx.token}`}
-									</span>
+									<CaptionL className="font-mono">
+										{formatTokenAmount(tx.amount, tx.token)}
+									</CaptionL>
 								</div>
 
-								<div className="grid grid-cols-2 gap-4 text-sm">
+								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<p className="text-muted-foreground">From</p>
-										<a
+										<CaptionL color="secondary">From</CaptionL>
+										<ExplorerLink
 											href={getExplorerLink(tx.from, tx.chainId, "address")}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="font-mono text-blue-600 hover:underline"
+											className="text-sm"
 										>
 											{formatAddress(tx.from)}
-										</a>
+										</ExplorerLink>
 									</div>
 									<div>
-										<p className="text-muted-foreground">To</p>
-										<a
+										<CaptionL color="secondary">To</CaptionL>
+										<ExplorerLink
 											href={getExplorerLink(tx.to, tx.chainId, "address")}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="font-mono text-blue-600 hover:underline"
+											className="text-sm"
 										>
 											{formatAddress(tx.to)}
-										</a>
+										</ExplorerLink>
 									</div>
 								</div>
 
-								<div className="flex items-center justify-between text-sm">
-									<a
+								<div className="flex items-center justify-between">
+									<ExplorerLink
 										href={getExplorerLink(tx.hash, tx.chainId, "tx")}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="font-mono text-blue-600 hover:underline"
+										className="text-sm"
 									>
 										{formatAddress(tx.hash)}
-									</a>
-									<span className="text-muted-foreground">
-										Block #{tx.blockNumber}
-									</span>
+									</ExplorerLink>
+									<CaptionL color="secondary">Block #{tx.blockNumber}</CaptionL>
 								</div>
 							</div>
 						);

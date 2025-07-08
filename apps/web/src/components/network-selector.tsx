@@ -12,9 +12,9 @@ import {
 } from "./ui/dropdown-menu";
 
 const networks = [
-	{ id: sepolia.id, name: "Ethereum", icon: "🔵" },
-	{ id: optimismSepolia.id, name: "Optimism", icon: "🔴" },
-	{ id: arbitrumSepolia.id, name: "Arbitrum", icon: "⚡" },
+	{ id: sepolia.id, name: "Ethereum", icon: "/eth.svg" },
+	{ id: optimismSepolia.id, name: "Optimism", icon: "/op.png" },
+	{ id: arbitrumSepolia.id, name: "Arbitrum", icon: "/arb.png" },
 ];
 
 interface NetworkSelectorProps {
@@ -56,7 +56,6 @@ export function NetworkSelector({
 			handleChange([networkId]);
 		} else {
 			if (currentSelected.includes(networkId)) {
-				// Prevent deselecting if it's the only selected network
 				if (currentSelected.length > 1) {
 					handleChange(currentSelected.filter((id) => id !== networkId));
 				}
@@ -73,7 +72,7 @@ export function NetworkSelector({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline" className="w-full justify-between">
+				<Button variant="outline" className="w-3/4 justify-between rounded-3/4">
 					{buttonText}
 					<ChevronDown className="ml-2 h-4 w-4" />
 				</Button>
@@ -86,7 +85,11 @@ export function NetworkSelector({
 						onCheckedChange={() => handleNetworkToggle(network.id)}
 					>
 						<div className="flex items-center gap-2">
-							<span className="text-lg">{network.icon}</span>
+							<img
+								src={network.icon}
+								alt={network.name}
+								className="w-5 h-5 rounded-full"
+							/>
 							<span>{network.name}</span>
 						</div>
 					</DropdownMenuCheckboxItem>

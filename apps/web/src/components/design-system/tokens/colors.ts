@@ -1,8 +1,9 @@
 export const colorTokens = {
-	brand: "rgba(131, 110, 249, 1)",
-	primary: "rgba(20, 21, 26, 1)",
-	secondary: "rgba(15, 19, 36, 0.60)",
-	tertiary: "rgba(13, 17, 38, 0.40)",
+	brand: "hsl(var(--color-primary))",
+	primary: "hsl(var(--color-foreground))",
+	secondary: "hsl(var(--color-muted-foreground))",
+	tertiary: "hsl(var(--color-muted-foreground) / 0.6)",
+	"monad-purple": "rgba(131, 110, 249, 1)",
 } as const;
 
 export type ColorToken = keyof typeof colorTokens;
@@ -13,4 +14,5 @@ export const colorVariables = {
 	"--color-primary": colorTokens.primary,
 	"--color-secondary": colorTokens.secondary,
 	"--color-tertiary": colorTokens.tertiary,
+	"--color-monad-purple": colorTokens["monad-purple"],
 } as const;

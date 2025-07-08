@@ -2,12 +2,10 @@ import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { toast } from "sonner";
-// AppRouter type - inferred from server
 import type { AppRouter } from "../../../server/src/types";
 
 const getErrorMessage = (error: unknown): string => {
 	if (error instanceof TRPCClientError) {
-		// Handle different tRPC error codes
 		switch (error.data?.code) {
 			case "BAD_REQUEST":
 				return "Invalid request. Please check your input.";
@@ -65,7 +63,6 @@ export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			retry: (failureCount, error) => {
-				// Don't retry on client errors (4xx)
 				if (
 					error instanceof TRPCClientError &&
 					error.data?.httpStatus &&
@@ -73,7 +70,6 @@ export const queryClient = new QueryClient({
 				) {
 					return false;
 				}
-				// Retry up to 3 times for server errors
 				return failureCount < 3;
 			},
 			retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -83,20 +79,16 @@ export const queryClient = new QueryClient({
 
 export const trpc = createTRPCReact<AppRouter>();
 
-// Get the API URL based on environment
 const getBaseUrl = () => {
 	if (typeof window !== "undefined") {
-		// Browser: use current location or environment specific URL
 		if (location.origin.includes("localhost")) {
 			return "http://localhost:3000";
 		}
-		// For production, use environment variable or fallback
 		return (
 			process.env.NEXT_PUBLIC_API_URL ||
 			"https://monad-takehome-server.ryanlvv.workers.dev"
 		);
 	}
-	// SSR: use environment variable or localhost
 	return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 };
 
@@ -107,7 +99,6 @@ export const trpcClient = trpc.createClient({
 			fetch: async (input, init) => {
 				const response = await fetch(input, {
 					...init,
-					signal: AbortSignal.timeout(30000), // 30 second timeout
 				});
 				return response;
 			},

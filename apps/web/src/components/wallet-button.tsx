@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAccount, useConnect } from "wagmi";
-import { Typography } from "./design-system/typography";
+import { BodyM, CaptionM } from "./design-system";
 
 interface WalletOption {
 	id: string;
@@ -128,26 +128,23 @@ export function WalletButton() {
 					key={wallet.id}
 					onClick={() => handleWalletConnect(wallet.id)}
 					disabled={isPending}
-					className="ml-6 flex w-[85%] cursor-pointer items-center gap-4 rounded-xl bg-gray-50 px-4 pt-4 pb-2 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+					className="ml-6 flex w-[85%] cursor-pointer items-center gap-4 rounded-xl bg-muted px-4 pt-4 pb-2 transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					<img
 						src={wallet.icon}
 						alt={wallet.name}
 						className="mb-4 size-8 rounded-lg"
 					/>
-					<Typography
-						variant="bodyM"
-						weight="medium"
-						className="flex flex-col items-start"
-						as="div"
-					>
-						<div>{wallet.name}</div>
-						<div className="min-h-[16px] text-muted-foreground text-xs">
-							{connectingWallet === wallet.id
-								? `Continue in your ${wallet.name} wallet.`
-								: ""}
+					<div className="flex flex-col items-start">
+						<BodyM weight="medium">{wallet.name}</BodyM>
+						<div className="min-h-[16px]">
+							{connectingWallet === wallet.id && (
+								<CaptionM color="secondary">
+									Continue in your {wallet.name} wallet.
+								</CaptionM>
+							)}
 						</div>
-					</Typography>
+					</div>
 				</button>
 			))}
 		</div>

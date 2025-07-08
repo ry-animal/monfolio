@@ -1,5 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
+import { TokenIcon } from "./ui/token-icon";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type Transaction = {
 	hash: string;
@@ -14,9 +16,7 @@ type Transaction = {
 
 interface VirtualizedTransactionListProps {
 	transactions: Transaction[];
-	getNetworkInfo: (
-		chainId: number,
-	) => { name: string; logo: string } | undefined;
+	getNetworkInfo: (chainId: number) => { name: string } | undefined;
 	formatAddress: (address: string) => string;
 	formatDate: (timestamp: number) => string;
 	getExplorerLink: (
@@ -80,13 +80,20 @@ export function VirtualizedTransactionList({
 						>
 							<div className="mx-1 mb-2 space-y-2 rounded-lg border p-4">
 								<div className="flex items-center justify-between">
-									<div className="flex flex-wrap items-center gap-2">
-										<span className="font-medium">{tx.token}</span>
-										{networkInfo && (
-											<span className="rounded-full bg-muted px-2 py-1 text-xs">
-												{networkInfo.logo} {networkInfo.name}
-											</span>
-										)}
+									<div className="flex items-center gap-2">
+										<TokenIcon
+											token={tx.token as "ETH" | "USDC"}
+											networkId={tx.chainId}
+											size="sm"
+										/>
+										<div className="flex flex-col">
+											<span className="font-medium">{tx.token}</span>
+											{networkInfo && (
+												<span className="text-xs text-muted-foreground">
+													{networkInfo.name}
+												</span>
+											)}
+										</div>
 										<span className="text-muted-foreground text-sm">
 											{formatDate(tx.timestamp * 1000)}
 										</span>
@@ -101,37 +108,58 @@ export function VirtualizedTransactionList({
 								<div className="grid grid-cols-2 gap-4 text-sm">
 									<div>
 										<p className="text-muted-foreground">From</p>
-										<a
-											href={getExplorerLink(tx.from, tx.chainId, "address")}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="font-mono text-blue-600 hover:underline"
-										>
-											{formatAddress(tx.from)}
-										</a>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<a
+													href={getExplorerLink(tx.from, tx.chainId, "address")}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="font-mono text-blue-600 hover:underline"
+												>
+													{formatAddress(tx.from)}
+												</a>
+											</TooltipTrigger>
+											<TooltipContent>
+												View sender address on explorer
+											</TooltipContent>
+										</Tooltip>
 									</div>
 									<div>
 										<p className="text-muted-foreground">To</p>
-										<a
-											href={getExplorerLink(tx.to, tx.chainId, "address")}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="font-mono text-blue-600 hover:underline"
-										>
-											{formatAddress(tx.to)}
-										</a>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<a
+													href={getExplorerLink(tx.to, tx.chainId, "address")}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="font-mono text-blue-600 hover:underline"
+												>
+													{formatAddress(tx.to)}
+												</a>
+											</TooltipTrigger>
+											<TooltipContent>
+												View recipient address on explorer
+											</TooltipContent>
+										</Tooltip>
 									</div>
 								</div>
 
 								<div className="flex items-center justify-between text-sm">
-									<a
-										href={getExplorerLink(tx.hash, tx.chainId, "tx")}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="font-mono text-blue-600 hover:underline"
-									>
-										{formatAddress(tx.hash)}
-									</a>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<a
+												href={getExplorerLink(tx.hash, tx.chainId, "tx")}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="font-mono text-blue-600 hover:underline"
+											>
+												{formatAddress(tx.hash)}
+											</a>
+										</TooltipTrigger>
+										<TooltipContent>
+											View transaction on explorer
+										</TooltipContent>
+									</Tooltip>
 									<span className="text-muted-foreground">
 										Block #{tx.blockNumber}
 									</span>
