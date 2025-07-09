@@ -1,5 +1,5 @@
 {
-	"name": "monad-takehome",
+	"name": "takehome",
 	"private": true,
 	"workspaces": [
 		"apps/*",

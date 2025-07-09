@@ -11,7 +11,7 @@ export const router = t.router;
 export const publicProcedure = t.procedure.use(
 	rateLimitMiddleware({
 		windowMs: 60 * 1000, // 1 minute
-		maxRequests: 100, // 100 requests per minute per IP
+		maxRequests: 300, // 300 requests per minute per IP
 	}),
 );
 
@@ -19,7 +19,7 @@ export const publicProcedure = t.procedure.use(
 export const restrictedProcedure = t.procedure.use(
 	rateLimitMiddleware({
 		windowMs: 60 * 1000, // 1 minute
-		maxRequests: 20, // 20 requests per minute per IP
+		maxRequests: 60, // 60 requests per minute per IP
 	}),
 );
 
@@ -28,7 +28,7 @@ export const authProcedure = t.procedure
 	.use(
 		rateLimitMiddleware({
 			windowMs: 60 * 1000, // 1 minute
-			maxRequests: 50, // 50 requests per minute per IP
+			maxRequests: 150, // 150 requests per minute per IP
 		}),
 	)
 	.use(authMiddleware({ requireAuth: false }));
@@ -38,7 +38,7 @@ export const protectedProcedure = t.procedure
 	.use(
 		rateLimitMiddleware({
 			windowMs: 60 * 1000, // 1 minute
-			maxRequests: 30, // 30 requests per minute per IP
+			maxRequests: 100, // 100 requests per minute per IP
 		}),
 	)
 	.use(authMiddleware({ requireAuth: true }))

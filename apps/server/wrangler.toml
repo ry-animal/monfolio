@@ -1,4 +1,4 @@
-name = "monad-takehome-server"
+name = "takehome-server"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
@@ -9,7 +9,7 @@ database_name = "monfolio-local-db"
 database_id = "eecca0cb-28a3-4be2-aaec-03d1cdf15b53"
 
 [env.development]
-name = "monfolio-server-dev"
+name = "takehome-server-dev"
 
 [[env.development.d1_databases]]
 binding = "DB"
@@ -17,15 +17,15 @@ database_name = "monfolio-local-db"
 database_id = "eecca0cb-28a3-4be2-aaec-03d1cdf15b53"
 
 [env.prod]
-name = "monad-takehome-server-temp"
+name = "takehome-server-prod"
 
 [[env.prod.d1_databases]]
 binding = "DB"
 database_name = "monfolio-production-db"
 database_id = "07884dec-69ee-47a0-bb7b-6eaca8d5b041"
 
-[vars]
-CORS_ORIGIN = "http://localhost:3001"
+[env.prod.vars]
+CORS_ORIGIN = "https://takehome-61d.pages.dev"
 
 # API keys moved to Cloudflare Workers secrets for security
 # Use: wrangler secret put ETHERSCAN_API_KEY

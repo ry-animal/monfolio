@@ -86,7 +86,7 @@ const getBaseUrl = () => {
 		}
 		return (
 			process.env.NEXT_PUBLIC_API_URL ||
-			"https://monad-takehome-server.ryanlvv.workers.dev"
+			"https://takehome-server.ryanlvv.workers.dev"
 		);
 	}
 	return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";

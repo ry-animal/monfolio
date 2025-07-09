@@ -42,8 +42,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			},
 			{
 				name: "keywords",
-				content:
-					"portfolio, tracker, dashboard, analytics, finance",
+				content: "portfolio, tracker, dashboard, analytics, finance",
 			},
 			{
 				name: "author",
@@ -72,8 +71,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 			},
 			{
 				name: "twitter:description",
-				content:
-					"Track your digital asset portfolio across multiple networks",
+				content: "Track your digital asset portfolio across multiple networks",
 			},
 		],
 		links: [

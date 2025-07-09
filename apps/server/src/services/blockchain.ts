@@ -7,7 +7,7 @@ export const CHAIN_CONFIG = {
 		explorerApiUrl: "https://api.etherscan.io/v2/api",
 		balanceApiUrl: "https://api.etherscan.io/v2/api",
 		nativeToken: "ETH",
-		usdcAddress: "0xA0b86a33E6A9b644f3c4c9f6dC80b0d0D1C1Ca01",
+		usdcAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
 		chainId: 11155111,
 	},
 	421614: {
