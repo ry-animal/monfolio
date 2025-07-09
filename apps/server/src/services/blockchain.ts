@@ -121,13 +121,13 @@ async function fetchNativeTransactions(
 
 	// Use URLSearchParams for proper URL encoding
 	const params = new URLSearchParams({
+		chainid: config.chainId.toString(),
 		module: "account",
 		action: "txlist",
 		address: address,
 		page: page.toString(),
 		offset: offset.toString(),
 		sort: "desc",
-		chainid: config.chainId.toString(),
 	});
 
 	if (apiKey) {
@@ -167,6 +167,7 @@ async function fetchTokenTransactions(
 
 	// Use URLSearchParams for proper URL encoding
 	const params = new URLSearchParams({
+		chainid: config.chainId.toString(),
 		module: "account",
 		action: "tokentx",
 		contractaddress: contractAddress,
@@ -174,7 +175,6 @@ async function fetchTokenTransactions(
 		page: page.toString(),
 		offset: offset.toString(),
 		sort: "desc",
-		chainid: config.chainId.toString(),
 	});
 
 	if (apiKey) {
@@ -233,11 +233,11 @@ export async function fetchBalance(
 
 		// Use URLSearchParams for proper URL encoding
 		const ethBalanceParams = new URLSearchParams({
+			chainid: config.chainId.toString(),
 			module: "account",
 			action: "balance",
 			address: address,
 			tag: "latest",
-			chainid: config.chainId.toString(),
 		});
 
 		if (apiKey) {
@@ -256,28 +256,20 @@ export async function fetchBalance(
 			console.error(
 				`ETH balance API error for chain ${chainId}: ${ethData.message}, URL: ${ethBalanceUrl}`,
 			);
-
-			if (ethData.message === "NOTOK") {
-				console.warn(
-					`ETH balance API returned NOTOK for chain ${chainId}, using zero balance`,
-				);
-				return { eth: "0", usdc: "0" };
-			}
-			// Don't throw error for balance fetch failures, return zero instead
-			console.warn(
-				`Using zero ETH balance for chain ${chainId} due to API error`,
-			);
 			return { eth: "0", usdc: "0" };
 		}
 
+		// Add debugging to see what balance we're getting
+		console.log(`ETH balance for ${address} on chain ${chainId}: ${ethData.result}`);
+
 		// Use URLSearchParams for proper URL encoding
 		const usdcBalanceParams = new URLSearchParams({
+			chainid: config.chainId.toString(),
 			module: "account",
 			action: "tokenbalance",
 			contractaddress: config.usdcAddress,
 			address: address,
 			tag: "latest",
-			chainid: config.chainId.toString(),
 		});
 
 		if (apiKey) {

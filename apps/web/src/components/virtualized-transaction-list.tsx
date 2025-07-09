@@ -38,8 +38,8 @@ export function VirtualizedTransactionList({
 	const virtualizer = useVirtualizer({
 		count: transactions.length,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 120, // Estimated height of each transaction item
-		overscan: 5, // Render 5 items outside the visible area
+		estimateSize: () => 120, // estimated height of each transaction item
+		overscan: 5, // render 5 items outside the visible area
 	});
 
 	if (transactions.length === 0) {

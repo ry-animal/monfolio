@@ -43,7 +43,6 @@ export function TransactionHistory({
 	const [limit, setLimit] = useState(12);
 	const [useVirtualization, setUseVirtualization] = useState(false);
 
-	// Fetch transactions using individual queries for each network
 	const ethQuery = trpc.getTransactions.useQuery(
 		{ address: address as string, chainId: sepolia.id, limit },
 		{
@@ -85,11 +84,11 @@ export function TransactionHistory({
 			? [ethQuery]
 			: []),
 		...(selectedNetworks.length === 0 ||
-		selectedNetworks.includes(arbitrumSepolia.id)
+			selectedNetworks.includes(arbitrumSepolia.id)
 			? [arbQuery]
 			: []),
 		...(selectedNetworks.length === 0 ||
-		selectedNetworks.includes(optimismSepolia.id)
+			selectedNetworks.includes(optimismSepolia.id)
 			? [opQuery]
 			: []),
 	];
@@ -100,7 +99,7 @@ export function TransactionHistory({
 
 	const allTransactions: Transaction[] = transactionQueries
 		.flatMap((query) => query.data || [])
-		.sort((a, b) => b.timestamp - a.timestamp) // Sort by newest first
+		.sort((a, b) => b.timestamp - a.timestamp)
 		.slice(0, useVirtualization ? undefined : limit);
 
 	const shouldUseVirtualization = allTransactions.length > 50;

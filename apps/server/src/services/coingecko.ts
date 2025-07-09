@@ -12,16 +12,18 @@ export interface PriceData {
 let _priceCache: { data: PriceData; timestamp: number } | null = null;
 const _CACHE_DURATION = 60000; // 1 minute cache
 
-export async function fetchTokenPrices(): Promise<PriceData> {
+export async function fetchTokenPrices(env?: any): Promise<PriceData> {
 	// Check cache first
 	if (_priceCache && Date.now() - _priceCache.timestamp < _CACHE_DURATION) {
 		return _priceCache.data;
 	}
 
 	try {
-		const response = await fetch(
-			"https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd&include_last_updated_at=true",
-		);
+		const apiKey = env?.COINGECKO_API_KEY;
+		const baseUrl = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd&include_last_updated_at=true";
+		const url = apiKey ? `${baseUrl}&x_cg_demo_api_key=${apiKey}` : baseUrl;
+		
+		const response = await fetch(url);
 
 		if (!response.ok) {
 			throw new Error(`CoinGecko API error: ${response.status}`);

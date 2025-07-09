@@ -82,7 +82,7 @@ function getDefaultElement(
 	}
 }
 
-// Convenience components for common usage
+// typography
 export const Display = (props: Omit<TypographyProps, "variant">) => (
 	<Typography variant="display" {...props} />
 );

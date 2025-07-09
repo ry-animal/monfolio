@@ -45,7 +45,7 @@ export const appRouter: ReturnType<typeof router> = router({
 					chainId as ChainId,
 					ctx.env,
 				);
-				const prices = await fetchTokenPrices();
+				const prices = await fetchTokenPrices(ctx.env);
 
 				const ethUsdValue = calculateUsdValue(
 					balance.eth,
@@ -272,9 +272,9 @@ export const appRouter: ReturnType<typeof router> = router({
 			}
 		}),
 
-	getTokenPrices: publicProcedure.query(async () => {
+	getTokenPrices: publicProcedure.query(async ({ ctx }) => {
 		try {
-			return await fetchTokenPrices();
+			return await fetchTokenPrices(ctx.env);
 		} catch (error) {
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",

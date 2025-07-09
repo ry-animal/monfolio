@@ -34,7 +34,6 @@ export function WalletButton() {
 		);
 		console.log("Trying to connect to:", walletId);
 
-		// Debug available connectors for Phantom
 		if (walletId === "phantom") {
 			console.log(
 				"All injected connectors:",
@@ -42,7 +41,6 @@ export function WalletButton() {
 			);
 		}
 
-		// Check if the specific wallet is actually installed
 		if (walletId === "metamask") {
 			console.log(
 				"MetaMask installed?",
@@ -61,7 +59,7 @@ export function WalletButton() {
 			console.log(
 				"Phantom installed?",
 				typeof window !== "undefined" &&
-					(window.ethereum?.isPhantom || window.solana?.isPhantom),
+				(window.ethereum?.isPhantom || window.solana?.isPhantom),
 			);
 			if (!window.ethereum?.isPhantom && !window.solana?.isPhantom) {
 				alert("Phantom is not installed. Please install Phantom to continue.");

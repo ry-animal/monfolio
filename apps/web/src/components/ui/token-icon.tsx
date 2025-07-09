@@ -13,10 +13,10 @@ const TOKEN_ICONS = {
 };
 
 const NETWORK_ICONS = {
-	11155111: "/eth.svg", // Sepolia
-	421614: "/arb.png", // Arbitrum Sepolia
-	11155420: "/op.png", // Optimism Sepolia
-	84532: "/base.png", // Base Sepolia - we'll need to add this
+	11155111: "/eth.svg", // sepolia
+	421614: "/arb.png", // arbitrum sepolia
+	11155420: "/op.png", // optimism sepolia
+	84532: "/base.png", // base sepolia - we'll need to add this
 };
 
 const NETWORK_LABELS = {

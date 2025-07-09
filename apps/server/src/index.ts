@@ -47,7 +47,25 @@ if (isProduction) {
 app.use(
 	"/*",
 	cors({
-		origin: env.CORS_ORIGIN || "",
+		origin: (origin) => {
+			// Allow the main domain and any preview URLs
+			const allowedOrigins = [
+				env.CORS_ORIGIN || "",
+				"https://takehome-61d.pages.dev"
+			];
+			
+			// Allow any *.takehome-61d.pages.dev subdomain for preview deployments
+			if (origin && origin.includes("takehome-61d.pages.dev")) {
+				return origin;
+			}
+			
+			// Return the origin if it's in the allowed list
+			if (allowedOrigins.includes(origin || "")) {
+				return origin;
+			}
+			
+			return false;
+		},
 		allowMethods: ["GET", "POST", "OPTIONS"],
 	}),
 );
