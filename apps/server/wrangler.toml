@@ -1,4 +1,4 @@
-name = "monfolio-server"
+name = "monad-takehome-server"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
@@ -17,7 +17,7 @@ database_name = "monfolio-local-db"
 database_id = "eecca0cb-28a3-4be2-aaec-03d1cdf15b53"
 
 [env.production]
-name = "monfolio-server"
+name = "monad-takehome-server"
 
 [[env.production.d1_databases]]
 binding = "DB"
