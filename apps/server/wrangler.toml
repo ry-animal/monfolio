@@ -16,10 +16,10 @@ binding = "DB"
 database_name = "monfolio-local-db"
 database_id = "eecca0cb-28a3-4be2-aaec-03d1cdf15b53"
 
-[env.production]
-name = "monad-takehome-server"
+[env.prod]
+name = "monad-takehome-server-temp"
 
-[[env.production.d1_databases]]
+[[env.prod.d1_databases]]
 binding = "DB"
 database_name = "monfolio-production-db"
 database_id = "07884dec-69ee-47a0-bb7b-6eaca8d5b041"
