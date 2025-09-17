@@ -4,8 +4,6 @@
 
 A crypto portfolio tracker built with modern web technologies. Track and manage your crypto and NFT portfolio across Ethereum, Arbitrum, and Optimism testnets.
 
-_Built as a takehome project for Monad Labs_
-
 ## Features
 
 - **Multi-Network Support** - Track balances across Ethereum, Arbitrum, and Optimism testnets
